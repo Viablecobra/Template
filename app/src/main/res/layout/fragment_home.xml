@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
+	android:id="@+id/linearlayout"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:padding="16dp"
+	android:background="@color/background">
+
+	<TextView
+		android:id="@+id/textview"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:text="Xelo Client"
+		android:layout_marginBottom="32dp"
+		style="@style/AppTitleStyle" />
+
+	<com.google.android.material.card.MaterialCardView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginBottom="16dp"
+		app:cardCornerRadius="16dp"
+		app:cardElevation="8dp"
+		app:cardBackgroundColor="@color/surface"
+		app:strokeWidth="1dp"
+		app:strokeColor="@color/outline">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:padding="24dp">
+
+			<LinearLayout
+	android:layout_width="match_parent"
+	android:layout_height="wrap_content"
+	android:orientation="horizontal"
+	android:gravity="center_vertical"
+	android:layout_marginBottom="24dp">
+
+	<TextView
+		android:id="@+id/textview1"
+		android:layout_width="0dp"
+		android:layout_height="wrap_content"
+		android:layout_weight="1"
+		android:text="@string/buildinfo"
+		android:textSize="16sp"
+		android:textColor="@color/onSurface" />
+
+<com.google.android.material.button.MaterialButton
+    android:id="@+id/versions_button"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:backgroundTint="@android:color/transparent"
+    app:icon="@drawable/swap_horizontal"
+    app:iconSize="24dp"
+    app:iconPadding="0dp"
+    style="@style/Widget.Material3.Button.IconButton" />
+</LinearLayout>
+
+			<com.google.android.material.button.MaterialButton
+				android:id="@+id/mbl2_load"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:text="Launch Minecraft"
+				android:textSize="16sp"
+				android:textStyle="bold"
+				android:padding="16dp"
+				app:cornerRadius="28dp"
+				app:icon="@drawable/ic_play"
+				app:iconGravity="textStart"
+				app:iconPadding="8dp"
+				style="@style/Widget.Material3.Button" />
+
+		</LinearLayout>
+
+	</com.google.android.material.card.MaterialCardView>
+
+	<com.google.android.material.card.MaterialCardView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		app:cardCornerRadius="16dp"
+		app:cardElevation="8dp"
+		app:cardBackgroundColor="@color/surface"
+		app:strokeWidth="1dp"
+		app:strokeColor="@color/outline">
+
+		<LinearLayout
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:orientation="vertical"
+			android:padding="24dp">
+
+			<LinearLayout
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:orientation="horizontal"
+				android:gravity="center_vertical"
+				android:layout_marginBottom="16dp">
+
+				<TextView
+					android:id="@+id/textview4"
+					android:layout_width="0dp"
+					android:layout_height="wrap_content"
+					android:layout_weight="1"
+					android:text="Latest Logs"
+					android:textSize="18sp"
+					android:textStyle="bold"
+					android:textColor="@color/onSurface" />
+
+				<com.google.android.material.button.MaterialButton
+					android:id="@+id/share_logs_button"
+					android:layout_width="wrap_content"
+					android:layout_height="wrap_content"
+					android:text="Share"
+					android:textSize="12sp"
+					app:icon="@drawable/ic_share"
+					app:iconSize="16dp"
+					app:cornerRadius="20dp"
+					style="@style/Widget.Material3.Button.TextButton" />
+
+			</LinearLayout>
+
+			<com.google.android.material.card.MaterialCardView
+				android:id="@+id/logCard"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:minHeight="80dp"
+				app:cardCornerRadius="12dp"
+				app:cardBackgroundColor="@color/surfaceVariant"
+				app:strokeWidth="1dp"
+				app:strokeColor="@color/outline">
+
+				<ScrollView
+					android:layout_width="match_parent"
+					android:layout_height="wrap_content"
+					android:padding="16dp"
+					android:scrollbars="vertical"
+					android:maxHeight="200dp">
+
+					<TextView
+						android:id="@+id/listener"
+						android:layout_width="match_parent"
+						android:layout_height="wrap_content"
+						android:text="Ready to launch Minecraft"
+						android:textSize="13sp"
+						android:textColor="@color/onSurfaceVariant"
+						android:fontFamily="monospace"
+						android:lineSpacingExtra="6dp"
+						android:letterSpacing="0.05" />
+
+				</ScrollView>
+
+			</com.google.android.material.card.MaterialCardView>
+
+		</LinearLayout>
+
+	</com.google.android.material.card.MaterialCardView>
+
+</LinearLayout>

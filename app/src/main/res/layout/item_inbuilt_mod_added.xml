@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="12dp"
+    android:gravity="center_vertical"
+    android:background="@drawable/rounded_card_background"
+    android:layout_marginBottom="8dp">
+
+    <!-- Colored bar on the left -->
+    <View
+        android:layout_width="4dp"
+        android:layout_height="match_parent"
+        android:background="@color/secondary"
+        android:layout_marginEnd="12dp" />
+
+    <!-- Texts block -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/inbuilt_mod_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TEST NAME"
+                android:textSize="16sp"
+                android:textColor="@color/white"
+                android:fontFamily="@font/mojangles" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/inbuilt_badge"
+                android:textSize="10sp"
+                android:textColor="@color/onSecondary"
+                android:background="@drawable/bg_inbuilt_badge"
+                android:paddingHorizontal="6dp"
+                android:paddingVertical="2dp"
+                android:layout_marginStart="8dp"
+                android:fontFamily="@font/mojangles" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/inbuilt_mod_desc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TEST DESCRIPTION"
+            android:textSize="12sp"
+            android:textColor="@color/white"
+            android:alpha="0.6"
+            android:fontFamily="@font/mojangles"
+            android:layout_marginTop="2dp" />
+    </LinearLayout>
+
+    <!-- Remove button on the right -->
+    <ImageButton
+        android:id="@+id/remove_inbuilt_button"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:src="@drawable/ic_close"
+        android:contentDescription="@string/remove"
+        android:padding="8dp" />
+</LinearLayout>

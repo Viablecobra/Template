@@ -1,0 +1,86 @@
+<resources>
+    <string name="app_name">Xelo Client</string>
+    <string name="xal_token">ms-xal-0000000048183522</string>
+	<string name="default_string">Hello moron!</string>
+	<string name="buildinfo">Release Build</string>
+	<string name="xeloversion">Xelo Client v1.5</string>
+	<string name="welcome">Xelo Client - Minecraft Bedrock Client</string>
+	<string name="mc_pkgname">minecraft package id:</string>
+<string name="thank_you_support">Thank you for your support</string>
+<string name="version_isolation">Version isolation</string>
+
+<!--crash activity-->
+
+<string name="crash_title">Application crashed</string>
+    <string name="crash_back_to_main">Back to Home</string>
+    <string name="crash_log_file_label">Log file:</string>
+    <string name="crash_log_file_missing">Log file not found or unreadable.</string>
+    <string name="crash_read_failed">Failed to read log: %1$s</string>
+    <string name="crash_emergency_label">Emergency:</string>
+    <string name="crash_no_details">No crash details available.</string>
+    
+        <!-- Popup labels -->
+    <string name="label_current_account">Current Account</string>
+    <string name="label_other_accounts">Other Accounts</string>
+    
+    <string name="dialog_title_exit_app">Exit App</string>
+    <string name="dialog_message_exit_app">Are you sure you want to exit?</string>
+    <string name="dialog_positive_exit">Exit</string>
+    <string name="show_logcat_overlay">Logcat overlay</string>
+    <string name="logcat_live">Logcat: <b>live</b></string>
+    <string name="logcat_paused">Logcat: paused</string>
+    <!-- Logcat Overlay i18n -->
+    <string name="logcat_filter_hint">Keyword filter</string>
+    <string name="logcat_blacklist_hint">Blacklist (comma-separated)</string>
+    <string name="logcat_filter_clear">Clear filters</string>
+    <string name="logcat_filter">Filter</string>
+    <string name="logcat_autoscroll">Auto-scroll</string>
+    <string name="logcat_pause">Pause</string>
+    <string name="logcat_clear">Clear</string>
+    <string name="logcat_close">Close</string>
+    <string name="logcat_corner_bottom_left">Resize: bottom-left</string>
+    <string name="logcat_corner_bottom_right">Resize: bottom-right</string>
+
+    <!-- Inbuilt Mods -->
+    <string name="inbuilt_mods">Inbuilt Mods</string>
+    <string name="inbuilt_mods_title">Inbuilt Mods</string>
+    <string name="inbuilt_mods_subtitle">Internal mods that run without native libraries</string>
+    <string name="no_inbuilt_mods_available">All inbuilt mods have been added</string>
+    <string name="inbuilt_mod_added">%s added to mods</string>
+    <string name="inbuilt_mod_removed">%s removed from mods</string>
+    <string name="add">Add</string>
+    <string name="remove">Remove</string>
+
+    <!-- Inbuilt Mods -->
+    <string name="inbuilt_mod_quick_drop">Quick Drop</string>
+    <string name="inbuilt_mod_quick_drop_desc">Drop items quickly</string>
+    <string name="inbuilt_mod_camera">Quick Camera Perspective</string>
+    <string name="inbuilt_mod_camera_desc">Toggle camera view</string>
+    <string name="inbuilt_mod_hud">Hide HUD</string>
+    <string name="inbuilt_mod_hud_desc">Hide hotbar and UI</string>
+    <string name="inbuilt_mod_autosprint">Auto Sprint</string>
+    <string name="inbuilt_mod_autosprint_desc">Toggle sprint on/off</string>
+    <string name="inbuilt_badge">INBUILT</string>
+    <string name="autosprint_key_ctrl">Ctrl Left</string>
+    <string name="autosprint_key_shift">Shift</string>
+    <string name="autosprint_key_label">Sprint Key:</string>
+    <string name="configure">Configure</string>
+
+<!-- ResourcepackHandler -->
+<string name="resourcepack_detected_title">Resource Pack Detected</string>
+<string name="resourcepack_detected_message">Found resource pack: %1$s. Apply it?</string>
+<string name="launch_now">Launch Now</string>
+<string name="launch_later">Launch Later</string>
+
+<!-- Previous dialog strings (if missing) -->
+<string name="dialog_title_no_version">No Version</string>
+<string name="dialog_message_no_version">Please select a version</string>
+<string name="dialog_positive_ok">OK</string>
+<string name="dialog_title_version_isolation">Version Isolation</string>
+<string name="dialog_message_version_isolation">Enable isolation?</string>
+<string name="dialog_positive_enable">Enable</string>
+<string name="dialog_negative_cancel">Cancel</string>
+<string name="dialog_title_launch_failed">Launch Failed</string>
+<string name="dialog_message_launch_failed">Error: %1$s</string>
+
+</resources>

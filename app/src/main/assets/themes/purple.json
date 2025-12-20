@@ -1,0 +1,41 @@
+{
+  "name": "Purple",
+  "author": "Xelo Team",
+  "description": "Material Design 3 Purple Theme",
+  "colors": {
+    "background": "#1A1A2E",
+    "onBackground": "#FFFFFF",
+    "surface": "#16213E",
+    "bottom_navigation": "#16213E",
+    "onSurface": "#FFFFFF",
+    "surfaceVariant": "#0F3460",
+    "onSurfaceVariant": "#E8E8E8",
+    "outline": "#533483",
+    "primary": "#9C27B0",
+    "onPrimary": "#FFFFFF",
+    "primaryContainer": "#4A148C",
+    "onPrimaryContainer": "#FFFFFF",
+    "secondary": "#E1BEE7",
+    "onSecondary": "#000000",
+    "secondaryContainer": "#7B1FA2",
+    "onSecondaryContainer": "#FFFFFF",
+    "tertiary": "#CE93D8",
+    "onTertiary": "#000000",
+    "tertiaryContainer": "#6A1B9A",
+    "onTertiaryContainer": "#FFFFFF",
+    "error": "#F44336",
+    "onError": "#FFFFFF",
+    "errorContainer": "#B71C1C",
+    "onErrorContainer": "#FFFFFF",
+    "success": "#4CAF50",
+    "info": "#2196F3",
+    "warning": "#FF9800",
+    "toggle": {
+      "track": "#533483",
+      "trackChecked": "#9C27B0",
+      "thumb": "#FFFFFF",
+      "thumbChecked": "#FFFFFF",
+      "ripple": "#9C27B0"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+pluginManagement {
+    repositories {
+        google {
+            content {
+                includeGroupByRegex("com\\.android.*")
+                includeGroupByRegex("com\\.google.*")
+                includeGroupByRegex("androidx.*")
+            }
+        }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.PREFER_PROJECT)
+    repositories {
+        google()
+        mavenCentral()
+        maven{url "https://repo.opencollab.dev/maven-snapshots"}
+        maven{url "https://repo.opencollab.dev/maven-releases"}
+    }
+}
+
+rootProject.name = "mbloader"
+include ':app'
+include ':minecraft'
+include ':minecraft-msftauth'

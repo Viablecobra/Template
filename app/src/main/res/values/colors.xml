@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="glow_green">#4AE0A0</color>
+    <color name="glow_cyan">#00FFFF</color>
+    <color name="outline">#BDBDBD</color>
+    <color name="scrim">#66000000</color>
+         
+    
+    <!-- Material Design 3 Dark Theme Colors -->
+<color name="background">#FF0A0A0A</color> <!-- Darker -->
+<color name="onBackground">#FFFFFFFF</color> <!-- Max contrast -->
+
+<color name="surface">#FF141414</color> <!-- Slightly darker -->
+<color name="onSurface">#FFFFFFFF</color>
+
+<color name="surfaceVariant">#FF1F1F1F</color> <!-- Darker -->
+<color name="onSurfaceVariant">#FFCCCCCC</color> <!-- Lighter -->
+ <!-- More visible -->
+
+<color name="primary">#FFFFFFFF</color>
+<color name="onPrimary">#FF000000</color>
+
+<color name="primaryContainer">#FF1F1F1F</color> <!-- Darker -->
+<color name="onPrimaryContainer">#FFFFFFFF</color>
+
+<color name="secondary">#FFFFFFFF</color> <!-- More contrast -->
+<color name="onSecondary">#FF000000</color>
+
+<color name="secondaryContainer">#FF2A2A2A</color> <!-- Slightly darker -->
+<color name="onSecondaryContainer">#FFFFFFFF</color>
+
+<color name="tertiary">#FFF5F5F5</color> <!-- Brighter -->
+<color name="onTertiary">#FF000000</color>
+
+<color name="tertiaryContainer">#FF3A3A3A</color>
+<color name="onTertiaryContainer">#FFFFFFFF</color>
+
+<color name="error">#FFFF6659</color> <!-- More vivid red -->
+<color name="onError">#FFFFFFFF</color> <!-- Better contrast -->
+
+<color name="errorContainer">#FFB00020</color> <!-- Richer red -->
+<color name="onErrorContainer">#FFFFFFFF</color>
+
+<color name="success">#FF00E676</color> <!-- Bright green -->
+<color name="info">#FF64B5F6</color> <!-- Brighter blue -->
+<color name="warning">#FFFFC107</color> <!-- Brighter orange -->
+</resources>

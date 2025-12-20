@@ -1,0 +1,130 @@
+name: Build Release APK
+
+on:
+  workflow_dispatch:
+    inputs:
+      create_release:
+        description: 'Create GitHub Release'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  release-build:
+    runs-on: ubuntu-latest
+    env:
+      JAVA_HOME: /usr/lib/jvm/java-17-openjdk-amd64
+      ANDROID_NDK_VERSION: r27c
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          ndk-version: ${{ env.ANDROID_NDK_VERSION }}
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-release-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', '**/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-release-
+            ${{ runner.os }}-gradle-
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Run Tests
+        run: ./gradlew testReleaseUnitTest --stacktrace
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: List Release APK files
+        run: |
+          echo "Release APK files generated:"
+          find app/build/outputs/apk/release -name "*.apk" -type f || echo "No APK files found"
+          echo "APK sizes:"
+          ls -lh app/build/outputs/apk/release/*.apk || echo "No APK files to show size for"
+
+      - name: Get APK info
+        id: apk_info
+        run: |
+          APK_PATH=$(find app/build/outputs/apk/release -name "*.apk" -type f | head -1)
+          if [ -n "$APK_PATH" ]; then
+            APK_SIZE=$(stat -c%s "$APK_PATH")
+            APK_SIZE_MB=$((APK_SIZE / 1024 / 1024))
+            APK_NAME=$(basename "$APK_PATH")
+            echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+            echo "apk_size_mb=$APK_SIZE_MB" >> $GITHUB_OUTPUT
+            echo "apk_name=$APK_NAME" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: origin-release-apk-${{ github.run_number }}
+          path: app/build/outputs/apk/release/*.apk
+          retention-days: 90
+          if-no-files-found: error
+
+      - name: Upload Release Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-test-results-${{ github.run_number }}
+          path: |
+            app/build/reports/tests/
+            app/build/test-results/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload Mapping Files
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-mapping-${{ github.run_number }}
+          path: |
+            app/build/outputs/mapping/release/
+            app/build/outputs/native-debug-symbols/release/
+          retention-days: 365
+          if-no-files-found: ignore
+
+      - name: Create GitHub Release
+        if: inputs.create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: app/build/outputs/apk/release/*.apk
+          name: Origin Launcher ${{ github.run_number }}
+          body: |
+            ## Origin Launcher Release (Build ${{ github.run_number }})
+            
+            ### 📱 APK Information
+            - **File**: ${{ steps.apk_info.outputs.apk_name }}
+            - **Size**: ~${{ steps.apk_info.outputs.apk_size_mb }} MB
+            - **Build**: ${{ github.run_number }}
+            - **Commit**: ${{ github.sha }}
+            
+            ### 🔧 Installation
+            1. Download the APK file below
+            2. Enable "Unknown Sources" in Android settings
+            3. Install the APK
+            
+            ### ⚠️ Note
+            This is a release build. Make sure to uninstall any previous debug versions.
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          tag_name: "v${{ github.run_number }}"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

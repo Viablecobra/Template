@@ -1,0 +1,6 @@
+[submodule "app/src/main/cpp/libHttpClient"]
+	path = app/src/main/cpp/libHttpClient
+	url = https://github.com/microsoft/libHttpClient
+[submodule "app/src/main/cpp/Preloader"]
+	path = app/src/main/cpp/Preloader
+	url = https://github.com/Viablecobra/Preloader.git
