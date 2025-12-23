@@ -158,7 +158,6 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
                 }
                 
                 boolean locked = InbuiltModSizeStore.getInstance().isLocked(id);
-                manager.setOverlayButtonLocked(id, locked);
             }
             for (Map.Entry<String, Integer> e : modOpacity.entrySet()) {
                 String id = e.getKey();
