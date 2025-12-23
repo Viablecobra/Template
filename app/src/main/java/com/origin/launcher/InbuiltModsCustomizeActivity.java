@@ -31,6 +31,7 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
     private View sliderContainer;
     private SeekBar sizeSeekBar;
     private TextView sliderLabel;
+    private MaterialSwitch lockSwitch;
     private final Map<String, Integer> modSizes = new HashMap<>();
     private final Map<String, Integer> modOpacity = new HashMap<>();
     private final Map<String, View> modButtons = new HashMap<>();
@@ -76,7 +77,7 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         Button doneButton = findViewById(R.id.done_button);
         Button sizeButton = findViewById(R.id.size_button);
         Button opacityButton = findViewById(R.id.opacity_button);
-        MaterialSwitch lockSwitch = findViewById(R.id.lock_button);
+        lockSwitch = findViewById(R.id.lock_button);
         FrameLayout grid = findViewById(R.id.inbuilt_buttons_grid);
         sliderContainer = findViewById(R.id.slider_container);
         sizeSeekBar = findViewById(R.id.size_seekbar);
@@ -118,6 +119,10 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
                 btn.setX(sx);
                 btn.setY(sy);
             }
+        }
+
+        if (lastSelectedId != null && lockSwitch != null) {
+            lockSwitch.setChecked(InbuiltModSizeStore.getInstance().isLocked(lastSelectedId));
         }
 
         for (Map.Entry<String, Integer> e : modSizes.entrySet()) {
@@ -250,6 +255,9 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         btn.setOnClickListener(v -> {
             lastSelectedButton = v;
             lastSelectedId = id;
+            if (lockSwitch != null) {
+                lockSwitch.setChecked(InbuiltModSizeStore.getInstance().isLocked(id));
+            }
 
             int sizeDp = modSizes.getOrDefault(id, DEFAULT_SIZE_DP);
             sizeDp = clampSize(sizeDp);
@@ -357,5 +365,8 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         sliderLabel.setText("Size");
         sizeSeekBar.setMax(100);
         sizeSeekBar.setProgress(sizeToProgress(defaultSizeDp));
+        if (lockSwitch != null) {
+            lockSwitch.setChecked(false);
+        }
     }
 }
