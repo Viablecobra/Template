@@ -25,7 +25,7 @@ import java.util.Map;
 
 public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
 
-    private enum SliderMode { SIZE, OPACITY, LOCK }
+    private enum SliderMode { SIZE, OPACITY }
 
     private View lastSelectedButton;
     private View sliderContainer;
@@ -187,9 +187,6 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
                     int opacity = clampOpacity(MIN_OPACITY + progress);
                     lastSelectedButton.setAlpha(opacity / 100f);
                     modOpacity.put(lastSelectedId, opacity);
-                } else if (currentMode == SliderMode.LOCK) {
-                    boolean locked = progress > 0;
-                    InbuiltModSizeStore.getInstance().setLocked(lastSelectedId, locked);
                 }
             }
 
@@ -279,11 +276,6 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
                 int range = MAX_OPACITY - MIN_OPACITY;
                 sizeSeekBar.setMax(range);
                 sizeSeekBar.setProgress(opacity - MIN_OPACITY);
-            } else if (currentMode == SliderMode.LOCK) {
-                sliderLabel.setText("Lock");
-                boolean isLocked = InbuiltModSizeStore.getInstance().isLocked(id);
-                sizeSeekBar.setMax(1);
-                sizeSeekBar.setProgress(isLocked ? 1 : 0);
             }
             sliderContainer.setVisibility(View.VISIBLE);
         });
