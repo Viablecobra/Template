@@ -101,13 +101,14 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             }
             return false;
         });
-        
+        InbuiltModSizeStore.getInstance().init(getApplicationContext());
+
+
         addModButton(grid, R.drawable.ic_sprint, ModIds.AUTO_SPRINT);
         addModButton(grid, R.drawable.ic_quick_drop, ModIds.QUICK_DROP);
         addModButton(grid, R.drawable.ic_hud, ModIds.TOGGLE_HUD);
         addModButton(grid, R.drawable.ic_camera, ModIds.CAMERA_PERSPECTIVE);
         
-        InbuiltModSizeStore.getInstance().init(getApplicationContext());
         InbuiltModSizeStore sizeStore = InbuiltModSizeStore.getInstance();
         for (Map.Entry<String, View> e : modButtons.entrySet()) {
             String id = e.getKey();
@@ -155,8 +156,6 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
                     result.putExtra("posx_" + id, x);
                     result.putExtra("posy_" + id, y);
                 }
-                
-                boolean locked = InbuiltModSizeStore.getInstance().isLocked(id);
             }
             for (Map.Entry<String, Integer> e : modOpacity.entrySet()) {
                 String id = e.getKey();
