@@ -121,10 +121,6 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             }
         }
 
-        if (lockSwitch != null) {
-            lockSwitch.setChecked(false);
-        }
-
         for (Map.Entry<String, Integer> e : modSizes.entrySet()) {
             int s = e.getValue();
             s = clampSize(s <= 0 ? DEFAULT_SIZE_DP : s);
@@ -357,8 +353,5 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         sliderLabel.setText("Size");
         sizeSeekBar.setMax(100);
         sizeSeekBar.setProgress(sizeToProgress(defaultSizeDp));
-        if (lockSwitch != null) {
-            lockSwitch.setChecked(false);
-        }
     }
 }
