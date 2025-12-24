@@ -29,13 +29,13 @@ class GamePackageManager private constructor(private val context: Context, priva
         "libfmod.so",
         "libMediaDecoders_Android.so",
         "libmaesdk.so",
-        "libminecraftpe.so",
-        "libmtbinloader2.so"
+        "libminecraftpe.so"
     )
 
     private val systemLoadedLibs = arrayOf(
         "libpairipcore.so",
-        "libxelo.so"
+        "libxelo.so",
+        "libmtbinloader2.so"
     )
 
     init {
