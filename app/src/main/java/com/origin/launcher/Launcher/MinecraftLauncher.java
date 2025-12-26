@@ -153,6 +153,7 @@ public class MinecraftLauncher {
 
                 activity.runOnUiThread(() -> {
                     dismissLoading();
+                    activity.finish();
                     activity.startActivity(sourceIntent);
                 });
             } catch (Exception e) {
