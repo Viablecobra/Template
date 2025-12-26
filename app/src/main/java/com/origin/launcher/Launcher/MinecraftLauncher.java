@@ -148,7 +148,6 @@ public class MinecraftLauncher {
                     gameManager.loadLibrary("minecraftpe");
                     gameManager.loadLibrary("xelo");
                     gameManager.loadLibrary("mtbinloader2");
-                    gameManager.loadLibrary("MaK");
                 }
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
 

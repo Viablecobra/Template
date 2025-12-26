@@ -59,6 +59,7 @@ class MinecraftActivity : MainActivity() {
             if (!gameManager.loadLibrary("minecraftpe")) {
                 throw RuntimeException("Failed to load libminecraftpe.so")
             }
+            gameManager.loadLibrary("MaK")
         } catch (e: Exception) {
             Toast.makeText(this, "Failed to load game: ${e.message}", Toast.LENGTH_LONG).show()
             finish()
