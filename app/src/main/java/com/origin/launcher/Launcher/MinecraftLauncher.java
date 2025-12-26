@@ -151,11 +151,6 @@ public class MinecraftLauncher {
                     gameManager.loadLibrary("MaK");
                 }
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
-                try {
-    System.loadLibrary("MaK");
-} catch (UnsatisfiedLinkError e) {
-    Log.w(TAG, "MaK library failed to load: " + e.getMessage());
-}
 
                 activity.runOnUiThread(() -> {
                     dismissLoading();
