@@ -23,13 +23,11 @@ import android.widget.ImageButton;
 import org.json.JSONObject;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 
 import com.origin.launcher.R;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModManager;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModSizeStore;
-import com.origin.launcher.MainActivity;
 
 public abstract class BaseOverlayButton {
 
@@ -80,42 +78,48 @@ public abstract class BaseOverlayButton {
     }
 
     private void applyButtonColorsFromConfig(ImageButton button) {
+        GradientDrawable normalBg = (GradientDrawable) activity.getDrawable(R.drawable.bg_overlay_button).mutate();
+        normalBg.setColor(Color.parseColor("#000000"));
+        normalBg.setStroke(dpToPx(2), Color.parseColor("#000000"));
+        
         try {
             File configDir = new File("/storage/emulated/0/games/xelo_client/toon");
             File toonFile = new File(configDir, "inbuilt.toon");
             
             if (!toonFile.exists()) {
-                Log.w("Overlay", "inbuilt.toon missing - using XML defaults");
+                Log.w("Overlay", "inbuilt.toon missing - using black default");
+            } else {
+                String toonText = readFileToString(toonFile).trim();
+                JSONObject overlayCfg;
+                if (toonText.startsWith("{")) {
+                    JSONObject config = new JSONObject(toonText);
+                    overlayCfg = config.getJSONObject("overlay_button");
+                } else {
+                    overlayCfg = new JSONObject(toonText);
+                }
+                
+                String normalColor = overlayCfg.getString("normal");
+                normalBg.setColor(Color.parseColor(normalColor));
+                normalBg.setStroke(dpToPx(2), Color.parseColor(normalColor));
+                
+                String activeColor = overlayCfg.getString("active");
+                GradientDrawable activeBg = (GradientDrawable) activity.getDrawable(R.drawable.bg_overlay_button_active).mutate();
+                activeBg.setColor(Color.parseColor(activeColor));
+                activeBg.setStroke(dpToPx(2), Color.parseColor(activeColor));
+                
+                StateListDrawable selector = new StateListDrawable();
+                selector.addState(new int[]{android.R.attr.state_pressed}, activeBg);
+                selector.addState(new int[]{-android.R.attr.state_pressed}, normalBg);
+                selector.addState(new int[]{}, normalBg);
+                
+                button.setBackground(selector);
                 return;
             }
-            
-            String toonText = readFileToString(toonFile).trim();
-            JSONObject overlayCfg;
-            if (toonText.startsWith("{")) {
-                JSONObject config = new JSONObject(toonText);
-                overlayCfg = config.getJSONObject("overlay_button");
-            } else {
-                overlayCfg = new JSONObject(toonText);
-            }
-            
-            String normalColor = overlayCfg.getString("normal");
-            GradientDrawable normalBg = (GradientDrawable) activity.getDrawable(R.drawable.bg_overlay_button).mutate();
-            normalBg.setColor(Color.parseColor(normalColor));
-            normalBg.setStroke(dpToPx(2), Color.parseColor(normalColor));
-            
-            String activeColor = overlayCfg.getString("active");
-            GradientDrawable activeBg = (GradientDrawable) activity.getDrawable(R.drawable.bg_overlay_button_active).mutate();
-            activeBg.setColor(Color.parseColor(activeColor));
-            activeBg.setStroke(dpToPx(2), Color.parseColor(activeColor));
-            
-            StateListDrawable selector = new StateListDrawable();
-            selector.addState(new int[]{android.R.attr.state_pressed}, activeBg);
-            selector.addState(new int[]{}, normalBg);
-            button.setBackground(selector);
-            
         } catch (Exception e) {
             Log.w("Overlay", "Config failed, using black default", e);
         }
+        
+        button.setBackground(normalBg);
     }
 
     protected abstract String getModId();
@@ -130,15 +134,14 @@ public abstract class BaseOverlayButton {
         try {
             overlayView = LayoutInflater.from(activity).inflate(R.layout.overlay_mod_button, null);
             ImageButton btn = (ImageButton) overlayView;
-            btn.setImageResource(getIconResource());
-            applyButtonColorsFromConfig(btn);
-
+            
             int buttonSize = getButtonSizePx();
             int padding = (int) (buttonSize * 0.22f);
             btn.setPadding(padding, padding, padding, padding);
             btn.setScaleType(ImageButton.ScaleType.FIT_CENTER);
             btn.setAlpha(getButtonAlpha());
-
+            btn.setImageResource(getIconResource());
+            
             wmParams = new WindowManager.LayoutParams(
                     buttonSize,
                     buttonSize,
@@ -156,6 +159,7 @@ public abstract class BaseOverlayButton {
 
             btn.setOnTouchListener(this::handleTouch);
             windowManager.addView(overlayView, wmParams);
+            applyButtonColorsFromConfig(btn);
             isShowing = true;
         } catch (Exception e) {
             showFallback(startX, startY);
@@ -169,15 +173,14 @@ public abstract class BaseOverlayButton {
 
         overlayView = LayoutInflater.from(activity).inflate(R.layout.overlay_mod_button, null);
         ImageButton btn = (ImageButton) overlayView;
-        btn.setImageResource(getIconResource());
-        applyButtonColorsFromConfig(btn);
-
+        
         int buttonSize = getButtonSizePx();
         int padding = (int) (buttonSize * 0.22f);
         btn.setPadding(padding, padding, padding, padding);
         btn.setScaleType(ImageButton.ScaleType.FIT_CENTER);
         btn.setAlpha(getButtonAlpha());
-
+        btn.setImageResource(getIconResource());
+        
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
                 buttonSize,
                 buttonSize
@@ -188,6 +191,7 @@ public abstract class BaseOverlayButton {
 
         btn.setOnTouchListener(this::handleTouchFallback);
         rootView.addView(overlayView, params);
+        applyButtonColorsFromConfig(btn);
         isShowing = true;
         wmParams = null;
     }
