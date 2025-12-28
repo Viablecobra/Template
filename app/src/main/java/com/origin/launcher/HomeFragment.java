@@ -144,17 +144,7 @@ private void ensureToonConfigExists() {
         
         File toonFile = new File(configDir, "inbuilt.toon");
         if (!toonFile.exists()) {
-            String defaultConfig = "{
-" +
-    "  "overlay_button": {
-" +
-    "    "normal": "#000000",
-" +
-    "    "active": "#000000"
-" +
-    "  }
-" +
-"}";
+            String defaultConfig = "{"overlay_button":{"normal":"#000000","active":"#000000"}}";
             try (FileOutputStream fos = new FileOutputStream(toonFile)) {
                 fos.write(defaultConfig.getBytes("UTF-8"));
             }
