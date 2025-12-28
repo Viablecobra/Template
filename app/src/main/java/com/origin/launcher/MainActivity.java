@@ -85,6 +85,7 @@ private static final int REQ_STORAGE_PERMS = 100;
 
         checkFirstLaunch();
         createNoMediaFile();
+        ensureToonConfigExists();
         InbuiltModSizeStore.getInstance().init(getApplicationContext());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -236,6 +237,32 @@ private void createNoMediaFile() {
             e.printStackTrace();
         }
     }
+
+private void ensureToonConfigExists() {
+    try {
+        File configDir = new File(Environment.getExternalStorageDirectory(), "games/xelo_client/toon");
+        if (!configDir.exists()) {
+            configDir.mkdirs();
+        }
+        
+        File toonFile = new File(configDir, "inbuilt.toon");
+        if (!toonFile.exists()) {
+            String json = """
+                {
+                  "overlay_button": {
+                    "normal": "#000000",
+                    "active": "#000000"
+                  }
+                }
+                """;
+            try (FileOutputStream fos = new FileOutputStream(toonFile)) {
+                fos.write(json.getBytes("UTF-8"));
+            }
+        }
+    } catch (Exception e) {
+        Log.w("XeloLauncher", "Failed to create default toon config", e);
+    }
+}
 
 private void continueFirstLaunchFlow(SharedPreferences prefs) {
     boolean isFirstLaunch = prefs.getBoolean(KEY_FIRST_LAUNCH, true);
