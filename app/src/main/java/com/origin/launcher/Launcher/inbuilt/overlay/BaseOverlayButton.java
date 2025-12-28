@@ -29,6 +29,7 @@ import java.io.IOException;
 import com.origin.launcher.R;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModManager;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModSizeStore;
+import com.origin.launcher.MainActivity;
 
 public abstract class BaseOverlayButton {
 
