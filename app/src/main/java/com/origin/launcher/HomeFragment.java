@@ -120,21 +120,6 @@ private void showErrorDialog(String title, String message) {
         .setPositiveButton("OK", null)
         .show();
 }
-
-private void createNoMediaFile() {
-        try {
-            java.io.File baseDir = new java.io.File(android.os.Environment.getExternalStorageDirectory(), "games/xelo_client");
-            if (!baseDir.exists()) {
-                baseDir.mkdirs();
-            }
-            java.io.File noMediaFile = new java.io.File(baseDir, ".nomedia");
-            if (!noMediaFile.exists()) {
-                noMediaFile.createNewFile();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
     
 private void ensureToonConfigExists() {
     try {
@@ -200,7 +185,6 @@ private void checkResourcepack() {
 
         // Apply initial theme
         applyInitialTheme(view);
-        createNoMediaFile();
         ensureToonConfigExists();
         
         mbl2_button.setOnClickListener(v -> launchGame());
