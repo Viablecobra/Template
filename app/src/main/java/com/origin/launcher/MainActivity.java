@@ -84,7 +84,6 @@ private static final int REQ_STORAGE_PERMS = 100;
 
 
         checkFirstLaunch();
-        ensureToonConfigExists();
         InbuiltModSizeStore.getInstance().init(getApplicationContext());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         createNoMediaFile();
@@ -261,6 +260,7 @@ private void ensureToonConfigExists() {
     } catch (Exception e) {
         Log.w("XeloLauncher", "Failed to create default toon config", e);
     }
+  }
 }
 
 private void continueFirstLaunchFlow(SharedPreferences prefs) {
