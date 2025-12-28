@@ -10,7 +10,6 @@ import com.origin.launcher.Launcher.inbuilt.overlay.InbuiltOverlayManager
 import com.origin.launcher.versions.GameVersion
 import com.origin.launcher.FeatureSettings
 import java.io.File
-import com.origin.launcher.MainActivity
 
 class MinecraftActivity : MainActivity() {
 
