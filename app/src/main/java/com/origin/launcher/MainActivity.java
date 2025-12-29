@@ -240,23 +240,16 @@ private void createNoMediaFile() {
 
 private void ensureToonConfigExists() {
     try {
-        File configDir = new File(Environment.getExternalStorageDirectory(), "games/xelo_client/toon");
+        File configDir = new File("/storage/emulated/0/games/xelo_client/toon");
         if (!configDir.exists()) {
             configDir.mkdirs();
         }
         
         File toonFile = new File(configDir, "inbuilt.toon");
         if (!toonFile.exists()) {
-            String json = """
-                {
-                  "overlay_button": {
-                    "normal": "#000000",
-                    "active": "#000000"
-                  }
-                }
-                """;
+            String defaultConfig = ""overlay_button": {}";
             try (FileOutputStream fos = new FileOutputStream(toonFile)) {
-                fos.write(json.getBytes("UTF-8"));
+                fos.write(defaultConfig.getBytes("UTF-8"));
             }
         }
     } catch (Exception e) {

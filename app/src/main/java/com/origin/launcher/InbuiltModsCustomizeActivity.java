@@ -1,6 +1,9 @@
 package com.origin.launcher;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.StateListDrawable;
 import android.os.Bundle;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +23,11 @@ import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModSizeStore;
 import com.origin.launcher.Launcher.inbuilt.model.ModIds;
 import com.origin.launcher.R;
 
+import org.json.JSONObject;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -68,6 +76,66 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         return Math.round(dp * getResources().getDisplayMetrics().density);
     }
 
+    private String readFileToString(File file) throws IOException {
+        int length = (int) file.length();
+        byte[] bytes = new byte[length];
+        try (FileInputStream fis = new FileInputStream(file)) {
+            fis.read(bytes);
+        }
+        return new String(bytes, "UTF-8");
+    }
+
+    private void applyPureToonColors(ImageButton button, String modId) {
+        GradientDrawable normalBg = new GradientDrawable();
+        normalBg.setShape(GradientDrawable.OVAL);
+        normalBg.setColor(Color.parseColor("#000000"));
+        normalBg.setStroke(dpToPx(2), Color.parseColor("#000000"));
+        
+        try {
+            File configDir = new File("/storage/emulated/0/games/xelo_client/toon");
+            File toonFile = new File(configDir, "inbuilt.toon");
+            
+            if (!toonFile.exists()) {
+                button.setBackground(normalBg);
+                return;
+            }
+            
+            String toonText = readFileToString(toonFile).trim();
+            JSONObject overlayCfg;
+            if (toonText.startsWith("{")) {
+                JSONObject config = new JSONObject(toonText);
+                overlayCfg = config.getJSONObject("overlay_button");
+            } else {
+                overlayCfg = new JSONObject(toonText);
+            }
+            
+            if (overlayCfg.has(modId)) {
+                JSONObject buttonCfg = overlayCfg.getJSONObject(modId);
+                
+                String normalColor = buttonCfg.getString("normal");
+                normalBg.setColor(Color.parseColor(normalColor));
+                normalBg.setStroke(dpToPx(2), Color.parseColor(normalColor));
+                
+                String activeColor = buttonCfg.getString("active");
+                GradientDrawable activeBg = new GradientDrawable();
+                activeBg.setShape(GradientDrawable.OVAL);
+                activeBg.setColor(Color.parseColor(activeColor));
+                activeBg.setStroke(dpToPx(2), Color.parseColor(activeColor));
+                
+                StateListDrawable selector = new StateListDrawable();
+                selector.addState(new int[]{android.R.attr.state_pressed}, activeBg);
+                selector.addState(new int[]{}, normalBg);
+                button.setBackground(selector);
+                return;
+            }
+            
+        } catch (Exception e) {
+            button.setBackground(normalBg);
+        }
+        
+        button.setBackground(normalBg);
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,7 +170,6 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             return false;
         });
         InbuiltModSizeStore.getInstance().init(getApplicationContext());
-
 
         addModButton(grid, R.drawable.ic_sprint, ModIds.AUTO_SPRINT);
         addModButton(grid, R.drawable.ic_quick_drop, ModIds.QUICK_DROP);
@@ -219,7 +286,7 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
     private void addModButton(FrameLayout grid, int iconResId, String id) {
         ImageButton btn = new ImageButton(this);
         btn.setImageResource(iconResId);
-        btn.setBackgroundResource(R.drawable.bg_overlay_button);
+        applyPureToonColors(btn, id);
         btn.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
         InbuiltModManager manager = InbuiltModManager.getInstance(this);

@@ -98,22 +98,26 @@ public abstract class BaseOverlayButton {
                     overlayCfg = new JSONObject(toonText);
                 }
                 
-                String normalColor = overlayCfg.getString("normal");
-                normalBg.setColor(Color.parseColor(normalColor));
-                normalBg.setStroke(dpToPx(2), Color.parseColor(normalColor));
-                
-                String activeColor = overlayCfg.getString("active");
-                GradientDrawable activeBg = (GradientDrawable) activity.getDrawable(R.drawable.bg_overlay_button_active).mutate();
-                activeBg.setColor(Color.parseColor(activeColor));
-                activeBg.setStroke(dpToPx(2), Color.parseColor(activeColor));
-                
-                StateListDrawable selector = new StateListDrawable();
-                selector.addState(new int[]{android.R.attr.state_pressed}, activeBg);
-                selector.addState(new int[]{-android.R.attr.state_pressed}, normalBg);
-                selector.addState(new int[]{}, normalBg);
-                
-                button.setBackground(selector);
-                return;
+                if (overlayCfg.has(getModId())) {
+                    JSONObject buttonCfg = overlayCfg.getJSONObject(getModId());
+                    
+                    String normalColor = buttonCfg.getString("normal");
+                    normalBg.setColor(Color.parseColor(normalColor));
+                    normalBg.setStroke(dpToPx(2), Color.parseColor(normalColor));
+                    
+                    String activeColor = buttonCfg.getString("active");
+                    GradientDrawable activeBg = (GradientDrawable) activity.getDrawable(R.drawable.bg_overlay_button_active).mutate();
+                    activeBg.setColor(Color.parseColor(activeColor));
+                    activeBg.setStroke(dpToPx(2), Color.parseColor(activeColor));
+                    
+                    StateListDrawable selector = new StateListDrawable();
+                    selector.addState(new int[]{android.R.attr.state_pressed}, activeBg);
+                    selector.addState(new int[]{-android.R.attr.state_pressed}, normalBg);
+                    selector.addState(new int[]{}, normalBg);
+                    
+                    button.setBackground(selector);
+                    return;
+                }
             }
         } catch (Exception e) {
             Log.w("Overlay", "Config failed, using black default", e);
