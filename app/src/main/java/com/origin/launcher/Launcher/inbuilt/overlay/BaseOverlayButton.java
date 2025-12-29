@@ -28,6 +28,7 @@ import java.io.IOException;
 import com.origin.launcher.R;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModManager;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModSizeStore;
+import com.origin.launcher.MainActivity;
 
 public abstract class BaseOverlayButton {
 
@@ -54,6 +55,9 @@ public abstract class BaseOverlayButton {
     public BaseOverlayButton(Activity activity) {
         this.activity = activity;
         this.windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
+        if (activity instanceof MainActivity) {
+            ((MainActivity) activity).ensureToonConfigExists();
+        }
         InbuiltModSizeStore.getInstance().init(activity.getApplicationContext());
     }
 
