@@ -1,9 +1,8 @@
 package com.origin.launcher
 
-import android.content.res.AssetFileDescriptor
 import android.database.Cursor
 import android.database.MatrixCursor
-import android.net.Uri
+import android.graphics.Point
 import android.os.Bundle
 import android.os.CancellationSignal
 import android.os.ParcelFileDescriptor
@@ -49,7 +48,7 @@ class XeloDocumentsProvider : DocumentsProvider() {
     override fun queryChildDocuments(
         parentDocumentId: String,
         projection: Array<out String>?,
-        sortOrder: String?
+        sortOrder: String
     ): Cursor {
         return queryChildDocuments(parentDocumentId, projection, null)
     }
@@ -82,8 +81,8 @@ class XeloDocumentsProvider : DocumentsProvider() {
 
     override fun openDocumentThumbnail(
         documentId: String,
-        sizeHint: Int,
-        signal: CancellationSignal?
+        sizeHint: Point,
+        signal: CancellationSignal
     ): ParcelFileDescriptor? {
         throw FileNotFoundException("Not implemented")
     }
@@ -91,7 +90,7 @@ class XeloDocumentsProvider : DocumentsProvider() {
     override fun openDocument(
         documentId: String,
         mode: String,
-        signal: CancellationSignal?
+        signal: CancellationSignal
     ): ParcelFileDescriptor {
         throw FileNotFoundException("Not implemented")
     }
