@@ -114,7 +114,7 @@ class XeloDocumentsProvider : DocumentsProvider() {
     }
 
     private fun getRootFlags(): Long {
-        var flags: Long = DocumentsContract.Root.FLAG_LOCAL_ONLY
+        var flags: Long = DocumentsContract.Root.FLAG_LOCAL_ONLY.toLong()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             flags = flags or DocumentsContract.Root.FLAG_SUPPORTS_CREATE.toLong() or DocumentsContract.Root.FLAG_SUPPORTS_IS_CHILD.toLong()
         }
@@ -122,11 +122,11 @@ class XeloDocumentsProvider : DocumentsProvider() {
     }
 
     private fun resolveRootProjection(projection: Array<out String>?): Array<String> {
-        return projection?.toTypedArray() ?: DEFAULT_ROOT_PROJECTION
+        return projection ?: DEFAULT_ROOT_PROJECTION
     }
 
     private fun resolveDocumentProjection(projection: Array<out String>?): Array<String> {
-        return projection?.toTypedArray() ?: DEFAULT_DOCUMENT_PROJECTION
+        return projection ?: DEFAULT_DOCUMENT_PROJECTION
     }
 
     private fun getTypeForFile(file: File): String {
@@ -150,7 +150,7 @@ class XeloDocumentsProvider : DocumentsProvider() {
         val id = docId ?: getDocIdForFile(file!!)
         val f = file ?: getFileForDocId(id)
         
-        var flags: Long = 0
+        var flags: Long = 0L
         if (f.canWrite()) {
             flags = flags or DocumentsContract.Document.FLAG_SUPPORTS_DELETE.toLong()
             if (f.isDirectory) {
