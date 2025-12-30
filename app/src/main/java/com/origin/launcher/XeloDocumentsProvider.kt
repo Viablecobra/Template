@@ -6,12 +6,12 @@ import android.database.MatrixCursor
 import android.net.Uri
 import android.os.Bundle
 import android.os.CancellationSignal
+import android.os.ParcelFileDescriptor
 import android.provider.DocumentsContract
 import android.provider.DocumentsProvider
 import android.webkit.MimeTypeMap
 import java.io.File
 import java.io.FileNotFoundException
-import java.io.IOException
 
 class XeloDocumentsProvider : DocumentsProvider() {
     
@@ -26,7 +26,7 @@ class XeloDocumentsProvider : DocumentsProvider() {
         )
         cursor.addRow(arrayOf(
             "xelo_root", "xelo_root", 0,
-            android.R.drawable.ic_menu_gallery, 
+            android.R.drawable.ic_menu_gallery,
             "Xelo Client", "Internal Storage",
             8000000000L
         ))
@@ -34,7 +34,7 @@ class XeloDocumentsProvider : DocumentsProvider() {
     }
 
     override fun queryChildDocuments(
-        parentDocumentId: String?,
+        parentDocumentId: String,
         projection: Array<out String>?,
         queryArgs: Bundle?
     ): Cursor {
@@ -46,10 +46,10 @@ class XeloDocumentsProvider : DocumentsProvider() {
         return cursor
     }
 
-    override fun queryDocument(documentId: String?, projection: Array<out String>?): Cursor {
-        val file = File(context?.filesDir, documentId ?: "")
+    override fun queryDocument(documentId: String, projection: Array<out String>?): Cursor {
+        val file = File(context?.filesDir, documentId)
         val cursor = MatrixCursor(projection ?: emptyArray())
-        includeFile(cursor, documentId ?: "", file)
+        includeFile(cursor, documentId, file)
         return cursor
     }
 
@@ -68,15 +68,15 @@ class XeloDocumentsProvider : DocumentsProvider() {
             .add(DocumentsContract.Document.COLUMN_FLAGS, 0)
     }
 
-    override fun getDocumentType(documentId: String?): String {
+    override fun getDocumentType(documentId: String): String {
         return DocumentsContract.Document.MIME_TYPE_DIR
     }
 
     override fun openDocument(
-        documentId: String?,
-        mode: String?,
+        documentId: String,
+        mode: String,
         signal: CancellationSignal?
-    ): AssetFileDescriptor? {
-        return null
+    ): ParcelFileDescriptor? {
+        throw FileNotFoundException("Not implemented")
     }
 }
