@@ -200,6 +200,19 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/file_provider_paths" />
         </provider>
+        
+        <provider
+    android:name="androidx.core.content.FileProvider"
+    android:authorities="com.origin.launcher.documents"
+    android:exported="true"
+    android:grantUriPermissions="true">
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/documents_paths" />
+    <intent-filter>
+        <action android:name="android.content.action.DOCUMENT_PROVIDER" />
+    </intent-filter>
+</provider>
 
         <activity
             android:name=".DiscordLoginActivity"
