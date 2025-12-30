@@ -1,5 +1,6 @@
 package com.origin.launcher
 
+import android.content.res.AssetFileDescriptor
 import android.database.Cursor
 import android.database.MatrixCursor
 import android.graphics.Point
@@ -83,15 +84,17 @@ class XeloDocumentsProvider : DocumentsProvider() {
         documentId: String,
         sizeHint: Point,
         signal: CancellationSignal
-    ): ParcelFileDescriptor? {
-        throw FileNotFoundException("Not implemented")
+    ): AssetFileDescriptor {
+        throw FileNotFoundException("Thumbnails not supported")
     }
 
     override fun openDocument(
         documentId: String,
         mode: String,
-        signal: CancellationSignal
+        signal: CancellationSignal?
     ): ParcelFileDescriptor {
-        throw FileNotFoundException("Not implemented")
+        val file = File(context?.filesDir, documentId)
+        val accessMode = ParcelFileDescriptor.parseMode(mode)
+        return ParcelFileDescriptor.open(file, accessMode)
     }
 }
