@@ -16,7 +16,7 @@ import java.io.FileNotFoundException
 
 class XeloDocumentsProvider : DocumentsProvider() {
     
-    override fun attachInfo(context: Context?, info: DocumentsContract.ProviderInfo?) {
+    override fun attachInfo(context: Context, info: DocumentsContract.ProviderInfo) {
         super.attachInfo(context, info)
     }
 
