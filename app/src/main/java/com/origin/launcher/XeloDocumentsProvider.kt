@@ -38,12 +38,20 @@ class XeloDocumentsProvider : DocumentsProvider() {
         projection: Array<out String>?,
         queryArgs: Bundle?
     ): Cursor {
-        val dir = context?.filesDir ?: return MatrixCursor(projection ?: emptyArray())
+        val dir = context?.filesDir ?: return MatrixCursor(emptyArray())
         val cursor = MatrixCursor(projection ?: emptyArray())
         dir.listFiles()?.forEach { file ->
             includeFile(cursor, file.name, file)
         }
         return cursor
+    }
+
+    override fun queryChildDocuments(
+        parentDocumentId: String,
+        projection: Array<out String>?,
+        sortOrder: String?
+    ): Cursor {
+        return queryChildDocuments(parentDocumentId, projection, null)
     }
 
     override fun queryDocument(documentId: String, projection: Array<out String>?): Cursor {
@@ -72,11 +80,19 @@ class XeloDocumentsProvider : DocumentsProvider() {
         return DocumentsContract.Document.MIME_TYPE_DIR
     }
 
+    override fun openDocumentThumbnail(
+        documentId: String,
+        sizeHint: Int,
+        signal: CancellationSignal?
+    ): ParcelFileDescriptor? {
+        throw FileNotFoundException("Not implemented")
+    }
+
     override fun openDocument(
         documentId: String,
         mode: String,
         signal: CancellationSignal?
-    ): ParcelFileDescriptor? {
+    ): ParcelFileDescriptor {
         throw FileNotFoundException("Not implemented")
     }
 }
