@@ -1,5 +1,6 @@
 package com.origin.launcher
 
+import android.content.Context
 import android.content.res.AssetFileDescriptor
 import android.database.Cursor
 import android.database.MatrixCursor
@@ -15,6 +16,10 @@ import java.io.FileNotFoundException
 
 class XeloDocumentsProvider : DocumentsProvider() {
     
+    override fun attachInfo(context: Context?, info: DocumentsContract.ProviderInfo?) {
+        super.attachInfo(context, info)
+    }
+
     override fun onCreate(): Boolean = true
 
     override fun queryRoots(projection: Array<out String>?): Cursor {
