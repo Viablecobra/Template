@@ -1,18 +1,23 @@
 package com.origin.launcher
 
 import android.content.res.AssetFileDescriptor
+import android.database.Cursor
 import android.database.MatrixCursor
 import android.net.Uri
+import android.os.Bundle
+import android.os.CancellationSignal
 import android.provider.DocumentsContract
 import android.provider.DocumentsProvider
 import android.webkit.MimeTypeMap
 import java.io.File
+import java.io.FileNotFoundException
+import java.io.IOException
 
 class XeloDocumentsProvider : DocumentsProvider() {
     
     override fun onCreate(): Boolean = true
 
-    override fun queryRoots(projection: Array<out String>?): android.database.Cursor {
+    override fun queryRoots(projection: Array<out String>?): Cursor {
         val cursor = MatrixCursor(
             arrayOf(
                 "root_id", "document_id", "flags", "icon", "title", 
@@ -21,29 +26,30 @@ class XeloDocumentsProvider : DocumentsProvider() {
         )
         cursor.addRow(arrayOf(
             "xelo_root", "xelo_root", 0,
-            android.R.drawable.ic_folder_open,
+            android.R.drawable.ic_menu_gallery, 
             "Xelo Client", "Internal Storage",
             8000000000L
         ))
         return cursor
     }
 
-    override fun queryDocument(documentId: String?, projection: Array<out String>?): android.database.Cursor {
-        val file = File(context?.filesDir, documentId ?: "")
-        val cursor = MatrixCursor(projection ?: emptyArray())
-        includeFile(cursor, documentId ?: "", file)
-        return cursor
-    }
-
     override fun queryChildDocuments(
         parentDocumentId: String?,
-        projection: Array<out String>?
-    ): android.database.Cursor {
+        projection: Array<out String>?,
+        queryArgs: Bundle?
+    ): Cursor {
         val dir = context?.filesDir ?: return MatrixCursor(projection ?: emptyArray())
         val cursor = MatrixCursor(projection ?: emptyArray())
         dir.listFiles()?.forEach { file ->
             includeFile(cursor, file.name, file)
         }
+        return cursor
+    }
+
+    override fun queryDocument(documentId: String?, projection: Array<out String>?): Cursor {
+        val file = File(context?.filesDir, documentId ?: "")
+        val cursor = MatrixCursor(projection ?: emptyArray())
+        includeFile(cursor, documentId ?: "", file)
         return cursor
     }
 
@@ -69,6 +75,8 @@ class XeloDocumentsProvider : DocumentsProvider() {
     override fun openDocument(
         documentId: String?,
         mode: String?,
-        uri: Uri?
-    ): AssetFileDescriptor? = null
+        signal: CancellationSignal?
+    ): AssetFileDescriptor? {
+        return null
+    }
 }
