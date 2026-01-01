@@ -102,8 +102,8 @@ public class ModulesFragment extends BaseThemedFragment {
             moduleItems = new ArrayList<>();
         
         moduleItems.add(new ModuleItem(
-                    "In-built Mods",
-                    "Manage Xelo in-built mods (AutoSprint, Quick Drop, etc.)",
+                    "Touch Modules",
+                    "Manage Xelo touch mods (AutoSprint, Quick Drop, etc.)",
                     "inbuilt_mods_entry"
             ));
         
@@ -228,7 +228,7 @@ private View createModuleView(ModuleItem module) {
     if ("inbuilt_mods_entry".equals(module.getConfigKey())) {
         // This card opens the Inbuilt Mods screen
         TextView openText = new TextView(requireContext());
-        openText.setText("Open");
+        openText.setText(">");
         openText.setTextSize(14);
         openText.setTypeface(null, android.graphics.Typeface.BOLD);
         ThemeUtils.applyThemeToTextView(openText, "primary");

@@ -179,7 +179,7 @@ private void checkFirstLaunch() {
             return;
         }
         
-        showFirstLaunchDialog(prefs, disclaimerShown, themesDialogShown, creditsShown);
+        showFirstLaunchDialog(prefs, disclaimerShown, creditsShown);
         prefs.edit().putBoolean(KEY_FIRST_LAUNCH, false).apply();
     } else if (!storageAsked) {
         ensureStorageAccess(prefs);
@@ -187,8 +187,6 @@ private void checkFirstLaunch() {
         showDisclaimerDialog(prefs);
     } else if (!creditsShown) {
         showThanksDialog(prefs);
-    } else if (!themesDialogShown) {
-        showThemesDialog(prefs, disclaimerShown);
     }
 }
 
