@@ -48,6 +48,7 @@
             android:backgroundTint="@color/primary"
             android:text="@string/add"
             android:textColor="@color/onPrimary"
+            android:textStyle="bold"
             android:paddingHorizontal="16dp"
             android:textSize="14sp"
             android:fontFamily="sans-serif-light" />
