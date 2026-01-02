@@ -7,6 +7,7 @@ annotation = "1.9.1"
 activityKtx = "1.11.0"
 apkParser = "2.6.10"
 browser = "1.9.0"
+bedrockConnection = "3.0.0.Beta10-SNAPSHOT"
 conscryptAndroid = "2.5.3"
 constraintlayout = "2.2.1"       # chosen from og; test has 2.1.4 (older)
 core = "1.58.0.0"
@@ -36,6 +37,7 @@ activityCompose = "1.10.1"
 composeBom = "2024.09.00"
 materialIconsExtended = "1.7.8"
 lifecycleProcess = "2.9.3"
+dynamicanimation = "1.1.0"
 
 [libraries]
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
@@ -95,6 +97,8 @@ espresso-core = { group = "androidx.test.espresso", name = "espresso-core", vers
 guava = { module = "com.google.guava:guava", version = "33.3.1-android" }
 bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.70" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+bedrock-connection = { module = "org.cloudburstmc.protocol:bedrock-connection", version.ref = "bedrockConnection" }
+androidx-dynamicanimation = { module = "androidx.dynamicanimation:dynamicanimation", version.ref = "dynamicanimation" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

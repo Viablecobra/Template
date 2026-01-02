@@ -184,6 +184,22 @@
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:alwaysRetainTaskState="true"
             tools:replace="android:configChanges,android:exported" />
+<!-- Accounts Management -->
+        <activity
+            android:name="com.origin.launcher.AccountsActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
+            tools:ignore="DiscouragedApi"
+            android:label="@string/accounts_title" />
+
+        <activity
+            android:name="com.origin.launcher.MsftLoginActivity"
+            android:exported="false"
+            android:screenOrientation="portrait"
+            android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
+            android:windowSoftInputMode="adjustResize"
+            tools:ignore="DiscouragedApi" />
 
         <activity
             android:name="com.origin.launcher.CrashActivity"
