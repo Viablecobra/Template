@@ -101,8 +101,6 @@
     <string name="dialog_message_login_required">Launcher-managed login is enabled, but no account is signed in. Go to Accounts to sign in.</string>
     <string name="go_to_accounts">Accounts</string>
     <string name="disable_launcher_login_and_continue">Close</string>
-    <string name="label_current_account">Current Account</string>
-    <string name="label_other_accounts">Other Accounts</string>
     <string name="ms_add_account">Add Account</string>
     <string name="ms_add_account_subtitle">Sign in with Microsoft</string>
 
