@@ -8,13 +8,6 @@ android {
     compileSdk 36
     buildToolsVersion "36.0.0"
 
-repositories {
-    google()
-    mavenCentral()
-    maven { url 'https://repo.opencollab.dev/maven-snapshots/' }
-    maven { url 'https://jitpack.io' }
-}
-
     defaultConfig {
         applicationId "com.origin.launcher"
         minSdk 26

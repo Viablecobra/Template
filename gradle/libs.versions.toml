@@ -7,6 +7,7 @@ annotation = "1.9.1"
 activityKtx = "1.11.0"
 apkParser = "2.6.10"
 browser = "1.9.0"
+bcprovJdk15on = "1.70"
 bedrockConnection = "3.0.0.Beta10-SNAPSHOT"
 conscryptAndroid = "2.5.3"
 constraintlayout = "2.2.1"       # chosen from og; test has 2.1.4 (older)
@@ -95,8 +96,8 @@ constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayo
 junit = { module = "junit:junit", version.ref = "junit" }
 espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 guava = { module = "com.google.guava:guava", version = "33.3.1-android" }
-bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version = "1.70" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
+bcprov-jdk15on = { module = "org.bouncycastle:bcprov-jdk15on", version.ref = "bcprovJdk15on" }
 bedrock-connection = { module = "org.cloudburstmc.protocol:bedrock-connection", version.ref = "bedrockConnection" }
 androidx-dynamicanimation = { module = "androidx.dynamicanimation:dynamicanimation", version.ref = "dynamicanimation" }
 
