@@ -104,8 +104,7 @@ public class HomeFragment extends BaseThemedFragment {
     private ActivityResultLauncher<Intent> accountLoginLauncher;
     private OnBackPressedCallback onBackPressedCallback;
     
-    private String msftUsername;
-    private String msftXuid;
+    private String msftUsername;private String msftXuid;
     private MsftAccountStore.MsftAccount getActiveAccount() {
     List<MsftAccountStore.MsftAccount> list = MsftAccountStore.list(requireActivity());
     for (MsftAccountStore.MsftAccount a : list) if (a.active) return a;
@@ -115,12 +114,6 @@ public class HomeFragment extends BaseThemedFragment {
 private void launchGame() {
     if (mbl2_button == null) return;
     mbl2_button.setEnabled(false);
-    
-    MsftAccountStore.MsftAccount active = getActiveAccount();
-    if (active != null && active.minecraftUsername != null) {
-        minecraftLauncher.setMsftLogin(active.minecraftUsername, active.xuid);
-        Log.d(TAG, "MC Login set: " + active.minecraftUsername);
-    }
 
     GameVersion version = versionManager != null ? versionManager.getSelectedVersion() : null;
 
@@ -130,12 +123,27 @@ private void launchGame() {
         return;
     }
 
+    if (FeatureSettings.getInstance().isLauncherManagedMcLoginEnabled()) {
+        MsftAccountStore.MsftAccount active = getActiveAccount();
+        boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
+        if (!loggedIn) {
+            mbl2_button.setEnabled(true);
+            new AlertDialog.Builder(requireContext())
+                .setTitle(getString(R.string.dialog_title_login_required))
+                .setMessage(getString(R.string.dialog_message_login_required))
+                .setPositiveButton(getString(R.string.go_to_accounts), (d, w) -> startActivity(new Intent(requireActivity(), AccountsActivity.class)))
+                .setNegativeButton(getString(R.string.disable_launcher_login_and_continue), null)
+                .show();
+            return;
+        }
+    }
+
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
         mbl2_button.setEnabled(true);
         showVersionIsolationDialog();
         return;
     }
-    
+
     new Thread(() -> {
         try {
             minecraftLauncher.launch(requireActivity().getIntent(), version);
