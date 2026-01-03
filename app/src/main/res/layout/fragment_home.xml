@@ -18,7 +18,7 @@
 		style="@style/AppTitleStyle" />
 
 <Button
-                    android:id="@+id/sign_in_button"
+                    android:id="@+id/signInButton"
                     style="@style/Widget.MaterialComponents.Button"
                     android:layout_width="wrap_content"
                     android:layout_height="28dp"
@@ -41,14 +41,14 @@
                     android:visibility="gone"/>
 
                 <FrameLayout
-                    android:id="@+id/account_avatar_container"
+                    android:id="@+id/accountAvatarContainer"
                     android:layout_width="32dp"
                     android:layout_height="32dp"
                     android:layout_marginStart="8dp"
                     android:visibility="gone">
 
                     <com.microsoft.xbox.idp.toolkit.CircleImageView
-                        android:id="@+id/account_avatar"
+                        android:id="@+id/accountAvatar"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:contentDescription="@string/xbox_avatar"
@@ -56,7 +56,7 @@
                         android:src="@drawable/ic_minecraft_cube" />
 
                     <ProgressBar
-                        android:id="@+id/avatar_progress"
+                        android:id="@+id/avatarProgress"
                         style="?android:attr/progressBarStyleSmall"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"

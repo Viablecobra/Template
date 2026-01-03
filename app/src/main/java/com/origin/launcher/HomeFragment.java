@@ -79,6 +79,8 @@ import com.origin.launcher.auth.MsftAccountStore;
  import com.origin.launcher.auth.MsftAuthManager;
  import com.origin.launcher.AccountTextUtils;
  import com.origin.launcher.DialogUtils;
+ 
+ import com.origin.launcher.R;
 
 public class HomeFragment extends BaseThemedFragment {
 
@@ -240,7 +242,7 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 // account manager
 
 accountLoginLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
-        if (result.getResultCode() == RESULT_OK && result.getData() != null) {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
             String code = result.getData().getStringExtra("ms_auth_code");
             String codeVerifier = result.getData().getStringExtra("ms_code_verifier");
             if (code != null && codeVerifier != null) {
