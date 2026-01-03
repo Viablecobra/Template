@@ -64,6 +64,7 @@ import com.origin.launcher.FeatureSettings;
 import com.origin.launcher.ResourcepackHandler;
 import com.origin.launcher.versions.GameVersion;
 import android.app.Activity;
+import androidx.activity.OnBackPressedCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import okhttp3.OkHttpClient;
