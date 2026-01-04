@@ -14,6 +14,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import androidx.core.content.FileProvider;
+import android.util.Pair;
 
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
@@ -129,6 +130,7 @@ private void launchGame() {
     MsftAccountStore.MsftAccount active = getActiveAccount();
     boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
     if (!loggedIn) {
+        mbl2_button.setEnabled(true);
         return;
     }
     
@@ -142,21 +144,29 @@ private void launchGame() {
         .apply();
         
     if (listener != null) {
-    listener.append("""
-        
+        listener.append("""
+            
 Injected: """ + active.minecraftUsername);
-}
+    }
     
     OkHttpClient client = new OkHttpClient();
-try {
-    MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
-    
-    coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
-    com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
-    Log.d("Xelo", "XBL refresh auth saved");
-} catch (Exception e) {
-    Log.e("Xelo", "Refresh auth failed", e);
-}
+    accountExecutor.execute(() -> {
+        try {
+            MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
+            Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken);
+            String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+            String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+            
+            MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.gamertag, minecraftUsername, xuid, xbox.avatarUrl);
+            
+            coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
+            com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
+            
+            Log.d("Xelo", "Full Xelo login + DeviceKey");
+        } catch (Exception e) {
+            Log.e("Xelo", "Xelo login failed", e);
+        }
+    });
 }
 
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
