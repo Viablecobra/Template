@@ -40,6 +40,7 @@ import java.util.concurrent.Executors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipInputStream;
+import java.util.List;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -64,6 +65,26 @@ import com.origin.launcher.FeatureSettings;
 import com.origin.launcher.ResourcepackHandler;
 import com.origin.launcher.versions.GameVersion;
 import android.app.Activity;
+import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import coelho.msftauth.api.oauth20.OAuth20Token;
+import android.widget.ProgressBar;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
+
+import com.origin.launcher.auth.MsftAccountStore;
+ import com.origin.launcher.auth.MsftAuthManager;
+ import com.origin.launcher.AccountTextUtils;
+ import com.origin.launcher.DialogUtils;
+ import coelho.msftauth.api.xbox.XboxDeviceKey;
+import com.origin.launcher.auth.storage.XalStorageManager;
+ 
+ import com.origin.launcher.R;
 
 public class HomeFragment extends BaseThemedFragment {
 
@@ -74,12 +95,26 @@ public class HomeFragment extends BaseThemedFragment {
     private com.google.android.material.button.MaterialButton shareLogsButton;
     private MinecraftLauncher minecraftLauncher;
     private VersionManager versionManager;
+    private com.microsoft.xbox.idp.toolkit.CircleImageView accountAvatar;
+    private View accountAvatarContainer;
+    private ProgressBar avatarProgress;
+    private Button signInButton;
+    private String lastAvatarXuid;
+    private final OkHttpClient avatarClient = new OkHttpClient();
+    private ExecutorService accountExecutor = Executors.newSingleThreadExecutor();
+    private com.origin.launcher.LoadingDialog accountLoadingDialog;
+    private ActivityResultLauncher<Intent> accountLoginLauncher;
+    private OnBackPressedCallback onBackPressedCallback;
     
-
+    private String msftUsername;private String msftXuid;
+    private MsftAccountStore.MsftAccount getActiveAccount() {
+    List<MsftAccountStore.MsftAccount> list = MsftAccountStore.list(requireActivity());
+    for (MsftAccountStore.MsftAccount a : list) if (a.active) return a;
+    return null;
+}
     
 private void launchGame() {
     if (mbl2_button == null) return;
-    
     mbl2_button.setEnabled(false);
 
     GameVersion version = versionManager != null ? versionManager.getSelectedVersion() : null;
@@ -90,12 +125,49 @@ private void launchGame() {
         return;
     }
 
+    if (FeatureSettings.getInstance().isLauncherManagedMcLoginEnabled()) {
+    MsftAccountStore.MsftAccount active = getActiveAccount();
+    boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
+    if (!loggedIn) {
+        return;
+    }
+    
+    SharedPreferences mcPrefs = requireActivity()
+        .getSharedPreferences("profile_minecraft", Context.MODE_PRIVATE);
+    mcPrefs.edit()
+        .putString("currentUser", active.minecraftUsername)
+        .putString("userId", active.xuid)
+        .putString("lastVersionId", "net.minecraft.bedrock")
+        .putBoolean("demo", false)
+        .apply();
+        
+    if (listener != null) {
+    listener.append("""
+        
+*** Injected: """ + active.minecraftUsername);
+}
+    
+    OkHttpClient client = new OkHttpClient();
+try {
+    OAuth20Token token = new OAuth20Token(
+        "", System.currentTimeMillis() / 1000L, 
+        active.refreshToken, "", "", "", ""
+    );
+    MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, requireActivity());
+    coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
+    com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
+    Log.d("Xelo", "XBL Auth + DeviceKey saved");
+} catch (Exception e) {
+    Log.e("Xelo", "XBL Auth failed", e);
+}
+}
+
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
         mbl2_button.setEnabled(true);
         showVersionIsolationDialog();
         return;
     }
-    
+
     new Thread(() -> {
         try {
             minecraftLauncher.launch(requireActivity().getIntent(), version);
@@ -155,6 +227,11 @@ private void checkResourcepack() {
         versions_button = view.findViewById(R.id.versions_button);
         shareLogsButton = view.findViewById(R.id.share_logs_button);
         Handler handler = new Handler(Looper.getMainLooper());
+        
+        signInButton = view.findViewById(R.id.signInButton);
+    accountAvatar = view.findViewById(R.id.accountAvatar);
+    accountAvatarContainer = view.findViewById(R.id.accountAvatarContainer);
+    avatarProgress = view.findViewById(R.id.avatarProgress);
 
         // Apply initial theme
         applyInitialTheme(view);
@@ -213,6 +290,52 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
     super.onViewCreated(view, savedInstanceState);
     setupManagersAndHandlers();
     checkResourcepack();
+    
+// account manager
+
+accountLoginLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+        if (result.getResultCode() == Activity.RESULT_OK && result.getData() != null) {
+            String code = result.getData().getStringExtra("ms_auth_code");
+            String codeVerifier = result.getData().getStringExtra("ms_code_verifier");
+            if (code != null && codeVerifier != null) {
+                accountLoadingDialog = DialogUtils.ensure(requireActivity(), accountLoadingDialog);
+                DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_exchanging));
+
+                accountExecutor.execute(() -> {
+                    OkHttpClient client = new OkHttpClient();
+                    try {
+                        OAuth20Token token = MsftAuthManager.exchangeCodeForToken(client, MsftAuthManager.DEFAULT_CLIENT_ID, code, codeVerifier, MsftAuthManager.DEFAULT_SCOPE + " offline_access");
+
+                        requireActivity().runOnUiThread(() -> DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_auth_xbox_device)));
+                        MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, requireActivity());
+
+                        requireActivity().runOnUiThread(() -> DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_fetch_minecraft_identity)));
+                        android.util.Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
+                        String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+                        String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+                        MsftAuthManager.saveAccount(requireActivity(), token, xbox.gamertag(), minecraftUsername, xuid, xbox.avatarUrl());
+
+                        requireActivity().runOnUiThread(() -> {
+                            DialogUtils.dismissQuietly(accountLoadingDialog);
+                            Toast.makeText(requireActivity(), getString(R.string.ms_login_success, (minecraftUsername != null ? minecraftUsername : getString(R.string.not_signed_in))), Toast.LENGTH_SHORT).show();
+                            refreshAccountHeaderUI();
+                        });
+                    } catch (Exception e) {
+                        requireActivity().runOnUiThread(() -> {
+                            DialogUtils.dismissQuietly(accountLoadingDialog);
+                            Toast.makeText(requireActivity(), getString(R.string.ms_login_failed_detail, e.getMessage()), Toast.LENGTH_LONG).show();
+                            refreshAccountHeaderUI();
+                        });
+                    }
+                });
+                return;
+            }
+        }
+        refreshAccountHeaderUI();
+    });
+    
+    initAccountHeader();
+    refreshAccountHeaderUI();
 }
 
 @Override
@@ -235,6 +358,12 @@ public void onDestroyView() {
                 if (mbl2_button instanceof MaterialButton) {
                     ThemeUtils.applyThemeToButton((MaterialButton) mbl2_button, requireContext());
                 }
+                
+                if (accountAvatar != null) {
+}
+if (signInButton != null) {
+    ThemeUtils.applyThemeToButton((MaterialButton) signInButton, requireContext());
+}
 
                 // Apply theme to share button (remove background, make it text button)
                 if (shareLogsButton != null) {
@@ -468,6 +597,7 @@ public void onDestroyView() {
     public void onResume() {
         super.onResume();
         DiscordRPCHelper.getInstance().updateMenuPresence("Playing");
+        refreshAccountHeaderUI();
     }
 
     @Override
@@ -475,4 +605,84 @@ public void onDestroyView() {
         super.onPause();
         DiscordRPCHelper.getInstance().updateIdlePresence();
     }
+    
+    private void initAccountHeader() {
+    signInButton = getView().findViewById(R.id.signInButton);
+    accountAvatar = getView().findViewById(R.id.accountAvatar);
+    accountAvatarContainer = getView().findViewById(R.id.accountAvatarContainer);
+    avatarProgress = getView().findViewById(R.id.avatarProgress);
+
+    if (signInButton != null) {
+        signInButton.setOnClickListener(v -> {
+            Intent intent = new Intent(requireActivity(), MsftLoginActivity.class);
+            accountLoginLauncher.launch(intent);
+        });
+    }
+    if (accountAvatarContainer != null) {
+        accountAvatarContainer.setOnClickListener(v -> showAccountSwitchPopup(v));
+    }
+}
+
+private void refreshAccountHeaderUI() {
+    MsftAccountStore.MsftAccount active = getActiveAccount();
+    if (active == null) {
+        if (signInButton != null) signInButton.setVisibility(View.VISIBLE);
+        if (accountAvatarContainer != null) accountAvatarContainer.setVisibility(View.GONE);
+        if (accountAvatar != null) {
+            accountAvatar.setImageDrawable(null);
+            lastAvatarXuid = null;
+        }
+        if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+        return;
+    }
+    
+    if (signInButton != null) signInButton.setVisibility(View.GONE);
+    if (accountAvatarContainer != null) accountAvatarContainer.setVisibility(View.VISIBLE);
+    loadXboxAvatar(active);
+}
+
+private void loadXboxAvatar(MsftAccountStore.MsftAccount active) {
+    if (accountAvatar == null) return;
+    
+    String url = AccountTextUtils.sanitizeUrl(active != null ? active.xboxAvatarUrl : null);
+    if (url == null) {
+        if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+        accountAvatar.setImageDrawable(null);
+        lastAvatarXuid = null;
+        return;
+    }
+    
+    accountAvatar.setImageDrawable(null);
+    if (avatarProgress != null) avatarProgress.setVisibility(View.VISIBLE);
+    
+    accountExecutor.execute(() -> {
+        try {
+            try (Response imgResp = avatarClient.newCall(new Request.Builder().url(url).build()).execute()) {
+                Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null) 
+                    ? BitmapFactory.decodeStream(imgResp.body().byteStream()) : null;
+                requireActivity().runOnUiThread(() -> {
+                    if (bmp != null) {
+                        accountAvatar.setImageBitmap(bmp);
+                    }
+                    if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+                });
+            }
+        } catch (Exception e) {
+            requireActivity().runOnUiThread(() -> {
+                if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+            });
+        }
+    });
+}
+
+private void showAccountSwitchPopup(View anchor) {
+    Intent intent = new Intent(requireActivity(), AccountsActivity.class);
+    startActivity(intent);
+  }
+  
+public void setMsftLogin(String username, String xuid) {
+    this.msftUsername = username;
+    this.msftXuid = xuid;
+    Log.d("MinecraftLauncher", "MSFT Login set: " + username);
+}
 }

@@ -7,6 +7,7 @@ public class FeatureSettings {
     private static Context appContext;
     private boolean versionIsolationEnabled = false;
     private boolean logcatOverlayEnabled = false;
+    private boolean launcherManagedMcLoginEnabled = false;
 
     public enum StorageType {
         INTERNAL,
@@ -37,6 +38,8 @@ public class FeatureSettings {
 
     public boolean isLogcatOverlayEnabled() { return logcatOverlayEnabled; }
     public void setLogcatOverlayEnabled(boolean enabled) { this.logcatOverlayEnabled = enabled; autoSave(); }
+    public boolean isLauncherManagedMcLoginEnabled() { return launcherManagedMcLoginEnabled; }
+    public void setLauncherManagedMcLoginEnabled(boolean enabled) { this.launcherManagedMcLoginEnabled = enabled; autoSave(); }
 
     private void autoSave() {
         if (appContext != null) {
