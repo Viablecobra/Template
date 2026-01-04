@@ -146,9 +146,7 @@ launchLoading.setMessage("Starting");
 
                 if (!loggedIn) {
     requireActivity().runOnUiThread(() -> {
-        launchLoading.dismiss();
-        mbl2_button.setEnabled(true);
-    });
+        mbl2_button.setEnabled(true));
     return;
 }
 
@@ -172,7 +170,6 @@ Injected: """ + active.minecraftUsername);
                     }
                 });
             }
-            launchLoading.dismiss();
 
             minecraftLauncher.launch(requireActivity().getIntent(), version);
 
