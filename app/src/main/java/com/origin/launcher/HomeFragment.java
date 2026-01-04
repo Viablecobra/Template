@@ -81,6 +81,8 @@ import com.origin.launcher.auth.MsftAccountStore;
  import com.origin.launcher.auth.MsftAuthManager;
  import com.origin.launcher.AccountTextUtils;
  import com.origin.launcher.DialogUtils;
+ import coelho.msftauth.api.xbox.XboxDeviceKey;
+import com.origin.launcher.auth.storage.XalStorageManager;
  
  import com.origin.launcher.R;
 
@@ -127,14 +129,6 @@ private void launchGame() {
     MsftAccountStore.MsftAccount active = getActiveAccount();
     boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
     if (!loggedIn) {
-        mbl2_button.setEnabled(true);
-        new AlertDialog.Builder(requireContext())
-            .setTitle(getString(R.string.dialog_title_login_required))
-            .setMessage(getString(R.string.dialog_message_login_required))
-            .setPositiveButton(getString(R.string.go_to_accounts), (d, w) -> 
-                startActivity(new Intent(requireActivity(), AccountsActivity.class)))
-            .setNegativeButton(getString(R.string.disable_launcher_login_and_continue), null)
-            .show();
         return;
     }
     
@@ -146,18 +140,28 @@ private void launchGame() {
         .putString("lastVersionId", "net.minecraft.bedrock")
         .putBoolean("demo", false)
         .apply();
+        
     if (listener != null) {
     listener.append("""
-        *** Injected: """ + active.minecraftUsername);
-  }
-OkHttpClient client = new OkHttpClient();
-try {
-    MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
-    Log.d("Xelo", "DeviceKey refreshed ");
-} catch (Exception e) {
-    Log.e("Xelo", "Auth refresh failed", e);
-  }
+        
+*** Injected: """ + active.minecraftUsername);
 }
+    
+    OkHttpClient client = new OkHttpClient();
+    try {
+        OAuth20Token token = MsftAuthManager.refreshToken(client, active.refreshToken);
+        
+        MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, requireActivity());
+        
+        coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
+        com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
+        
+        Log.d("Xelo", "XBL Auth + DeviceKey saved ");
+    } catch (Exception e) {
+        Log.e("Xelo", "XBL Auth failed", e);
+    }
+}
+
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
         mbl2_button.setEnabled(true);
         showVersionIsolationDialog();
