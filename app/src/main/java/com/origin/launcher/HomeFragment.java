@@ -149,7 +149,10 @@ private void launchGame() {
     
     OkHttpClient client = new OkHttpClient();
 try {
-    OAuth20Token token = new OAuth20Token(active.refreshToken, active.refreshToken);
+    OAuth20Token token = new OAuth20Token(
+        "", System.currentTimeMillis() / 1000L, 
+        active.refreshToken, "", "", "", ""
+    );
     MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, requireActivity());
     coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
     com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
