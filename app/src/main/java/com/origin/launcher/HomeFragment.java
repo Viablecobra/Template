@@ -148,18 +148,15 @@ private void launchGame() {
 }
     
     OkHttpClient client = new OkHttpClient();
-    try {
-        OAuth20Token token = MsftAuthManager.refreshToken(client, active.refreshToken);
-        
-        MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, requireActivity());
-        
-        coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
-        com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
-        
-        Log.d("Xelo", "XBL Auth + DeviceKey saved ");
-    } catch (Exception e) {
-        Log.e("Xelo", "XBL Auth failed", e);
-    }
+try {
+    OAuth20Token token = new OAuth20Token(active.accessToken, active.refreshToken);
+    MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.performXboxAuth(client, token, requireActivity());
+    coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
+    com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
+    Log.d("Xelo", "XBL Auth + DeviceKey saved");
+} catch (Exception e) {
+    Log.e("Xelo", "XBL Auth failed", e);
+   }
 }
 
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
