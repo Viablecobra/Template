@@ -96,7 +96,7 @@
     <string name="ms_active_badge">Active</string>
     <string name="ms_account_subtitle_format">User ID: %1$s • Updated: %2$s</string>
     <string name="xbox_avatar">Xbox avatar</string>
-    <string name="launcher_managed_mc_login">Sign in to Minecraft with Xelo Client</string>
+    <string name="launcher_managed_mc_login">Viable Account Manager</string>
     <string name="dialog_title_login_required">Sign-in required</string>
     <string name="dialog_message_login_required">Launcher-managed login is enabled, but no account is signed in. Go to Accounts to sign in.</string>
     <string name="go_to_accounts">Accounts</string>

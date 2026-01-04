@@ -73,7 +73,7 @@
             android:exported="false"
             android:launchMode="standard"
             android:screenOrientation="sensorLandscape"
-            android:taskAffinity="com.origin.launcher.Launcher"
+            android:taskAffinity="com.origin.launcher.minecraft"
             android:theme="@style/AppFullScreenTheme"
             tools:ignore="DiscouragedApi">
             <meta-data
