@@ -153,19 +153,18 @@ private void launchGame() {
 }
 
 OkHttpClient client = new OkHttpClient();
-    try {
-        MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
-        if (listener != null) {
-            listener.append("""
+try {
+    MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
+    if (listener != null) {
+        listener.append("""
 DeviceKey refreshed""");
-        }
-    } catch (Exception e) {
-        Log.e("Xelo", "Auth refresh failed", e);
-        if (listener != null) {
-            listener.append("
-Auth refresh failed");
-        }
     }
+} catch (Exception e) {
+    Log.e("Xelo", "Auth refresh failed", e);
+    if (listener != null) {
+        listener.append("""Auth refresh failed""");
+    }
+}
 
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
         mbl2_button.setEnabled(true);
