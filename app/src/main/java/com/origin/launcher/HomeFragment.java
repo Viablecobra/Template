@@ -119,67 +119,11 @@ private void launchGame() {
     mbl2_button.setEnabled(false);
 
     GameVersion version = versionManager != null ? versionManager.getSelectedVersion() : null;
-
     if (version == null) {
         mbl2_button.setEnabled(true);
         showErrorDialog("No Version", "Please select a Minecraft version first.");
         return;
     }
-
-    if (FeatureSettings.getInstance().isLauncherManagedMcLoginEnabled()) {
-    MsftAccountStore.MsftAccount active = getActiveAccount();
-    boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
-    
-    if (!loggedIn) {
-        mbl2_button.setEnabled(true);
-        return;
-    }
-
-    SharedPreferences mcPrefs = requireActivity().getSharedPreferences("profile_minecraft", Context.MODE_PRIVATE);
-    mcPrefs.edit()
-        .putString("currentUser", active.minecraftUsername)
-        .putString("userId", active.xuid)
-        .putString("lastVersionId", "net.minecraft.bedrock")
-        .putBoolean("demo", false)
-        .apply();
-
-    OkHttpClient client = new OkHttpClient();
-accountExecutor.execute(() -> {
-    try {
-        MsftAuthManager.XboxAuthResult xbox =
-                MsftAuthManager.refreshAndAuth(client, active, requireActivity());
-
-        Pair<String, String> nameAndXuid =
-                MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
-
-        String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
-        String xuid = nameAndXuid != null ? nameAndXuid.second : null;
-
-        MsftAccountStore.addOrUpdate(
-                requireActivity(),
-                active.msUserId,
-                active.refreshToken,
-                xbox.gamertag(),
-                minecraftUsername,
-                xuid,
-                xbox.avatarUrl()
-        );
-
-        XboxDeviceKey deviceKey = new XboxDeviceKey(requireActivity());
-        XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
-
-        Log.d("Xelo", "Auth synced with Minecraft successfully");
-    } catch (Exception e) {
-        Log.e("Xelo", "Background auth failed", e);
-    }
-});
-    
-    if (listener != null) {
-        listener.append("""
-            
-Injected: """ + active.minecraftUsername);
-    }
-}
 
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
         mbl2_button.setEnabled(true);
@@ -189,12 +133,51 @@ Injected: """ + active.minecraftUsername);
 
     new Thread(() -> {
         try {
+            if (FeatureSettings.getInstance().isLauncherManagedMcLoginEnabled()) {
+                MsftAccountStore.MsftAccount active = getActiveAccount();
+                boolean loggedIn = active != null && active.minecraftUsername != null && !active.minecraftUsername.isEmpty();
+
+                if (!loggedIn) {
+                    requireActivity().runOnUiThread(() -> mbl2_button.setEnabled(true));
+                    return;
+                }
+
+                SharedPreferences mcPrefs = requireActivity().getSharedPreferences("profile_minecraft", Context.MODE_PRIVATE);
+                mcPrefs.edit()
+                    .putString("currentUser", active.minecraftUsername)
+                    .putString("userId", active.xuid)
+                    .putString("lastVersionId", "net.minecraft.bedrock")
+                    .putBoolean("demo", false)
+                    .apply();
+
+                OkHttpClient client = new OkHttpClient();
+                MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
+
+                android.util.Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
+                String mUsername = nameAndXuid != null ? nameAndXuid.first : null;
+                String mXuid = nameAndXuid != null ? nameAndXuid.second : null;
+
+                MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.gamertag(), mUsername, mXuid, xbox.avatarUrl());
+
+                XboxDeviceKey deviceKey = new XboxDeviceKey(requireActivity());
+                XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
+
+                requireActivity().runOnUiThread(() -> {
+                    if (listener != null) {
+                        listener.append("
+Injected: " + active.minecraftUsername);
+                    }
+                });
+            }
+
             minecraftLauncher.launch(requireActivity().getIntent(), version);
+
             requireActivity().runOnUiThread(() -> {
                 mbl2_button.setEnabled(true);
                 if (listener != null) listener.setText("Minecraft launched successfully");
             });
         } catch (Exception e) {
+            Log.e("Xelo", "Launch failed", e);
             requireActivity().runOnUiThread(() -> {
                 mbl2_button.setEnabled(true);
                 showErrorDialog("Launch Failed", e.getMessage());
