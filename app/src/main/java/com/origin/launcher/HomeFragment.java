@@ -142,15 +142,9 @@ private void launchGame() {
                     return;
                 }
 
-                SharedPreferences mcPrefs = requireActivity().getSharedPreferences("profile_minecraft", Context.MODE_PRIVATE);
-                mcPrefs.edit()
-                    .putString("currentUser", active.minecraftUsername)
-                    .putString("userId", active.xuid)
-                    .putString("lastVersionId", "net.minecraft.bedrock")
-                    .putBoolean("demo", false)
-                    .apply();
 
                 OkHttpClient client = new OkHttpClient();
+                
                 MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
 
                 android.util.Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
@@ -159,8 +153,6 @@ private void launchGame() {
 
                 MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.gamertag(), mUsername, mXuid, xbox.avatarUrl());
 
-                XboxDeviceKey deviceKey = new XboxDeviceKey(requireActivity());
-                XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
 
                 requireActivity().runOnUiThread(() -> {
                     if (listener != null) {
