@@ -164,8 +164,9 @@ private void launchGame() {
 
                 requireActivity().runOnUiThread(() -> {
                     if (listener != null) {
-                        listener.append("
-Injected: " + active.minecraftUsername);
+                        listener.append("""
+            
+Injected: """ + active.minecraftUsername);
                     }
                 });
             }
