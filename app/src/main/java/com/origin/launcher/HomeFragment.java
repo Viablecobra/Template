@@ -153,11 +153,11 @@ Injected: """ + active.minecraftUsername);
 accountExecutor.execute(() -> {
     try {
         MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
-        Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.getXstsToken());
+        Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken);
         String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
         String xuid = nameAndXuid != null ? nameAndXuid.second : null;
         
-        MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.getGamertag(), minecraftUsername, xuid, xbox.getAvatarUrl());
+        MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.gamertag, minecraftUsername, xuid, xbox.avatarUrl);
         
         coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
         com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
