@@ -150,23 +150,23 @@ Injected: """ + active.minecraftUsername);
     }
     
     OkHttpClient client = new OkHttpClient();
-    accountExecutor.execute(() -> {
-        try {
-            MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
-            Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken);
-            String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
-            String xuid = nameAndXuid != null ? nameAndXuid.second : null;
-            
-            MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.gamertag, minecraftUsername, xuid, xbox.avatarUrl);
-            
-            coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
-            com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
-            
-            Log.d("Xelo", "Full Xelo login + DeviceKey");
-        } catch (Exception e) {
-            Log.e("Xelo", "Xelo login failed", e);
-        }
-    });
+accountExecutor.execute(() -> {
+    try {
+        MsftAuthManager.XboxAuthResult xbox = MsftAuthManager.refreshAndAuth(client, active, requireActivity());
+        Pair<String, String> nameAndXuid = MsftAuthManager.fetchMinecraftIdentity(client, xbox.getXstsToken());
+        String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+        String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+        
+        MsftAccountStore.addOrUpdate(requireActivity(), active.msUserId, active.refreshToken, xbox.getGamertag(), minecraftUsername, xuid, xbox.getAvatarUrl());
+        
+        coelho.msftauth.api.xbox.XboxDeviceKey deviceKey = new coelho.msftauth.api.xbox.XboxDeviceKey(requireActivity());
+        com.origin.launcher.auth.storage.XalStorageManager.saveDeviceIdentity(requireActivity(), active.msUserId, deviceKey);
+        
+        Log.d("Xelo", "Full Xelo login + DeviceKey");
+    } catch (Exception e) {
+        Log.e("Xelo", "Xelo login failed", e);
+    }
+});
 }
 
     if (!version.isInstalled && !FeatureSettings.getInstance().isVersionIsolationEnabled()) {
