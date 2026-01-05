@@ -124,11 +124,30 @@ private void launchGame() {
             .putString("currentUser", active.minecraftUsername)
             .putString("userId", active.xuid)
             .apply();
+            
         XboxDeviceKey deviceKey = XboxDeviceKey.restoreKeyAndId(requireActivity());
-if (deviceKey != null) {
-    XalStorageManager storage = new XalStorageManager();
-    storage.saveDeviceIdentity(requireActivity(), deviceKey.getId(), deviceKey);
-}
+        if (deviceKey != null) {
+            XalStorageManager storage = new XalStorageManager();
+            storage.saveDeviceIdentity(requireActivity(), deviceKey.getId(), deviceKey);
+        }
+        
+        File xalDir = new File(requireActivity().getFilesDir(), "xal");
+        xalDir.mkdirs();
+        File accountsFile = new File(xalDir, "accounts.json");
+        
+        JSONObject accounts = new JSONObject();
+        JSONObject accountObj = new JSONObject();
+        accountObj.put("gamertag", active.gamertag != null ? active.gamertag : active.minecraftUsername);
+        accountObj.put("minecraftUsername", active.minecraftUsername);
+        accountObj.put("xuid", active.xuid);
+        accountObj.put("active", true);
+        
+        accounts.put("accounts", new JSONArray().put(accountObj));
+        
+        try (FileWriter writer = new FileWriter(accountsFile)) {
+            writer.write(accounts.toString(2));
+        }
+        Log.d("Xelo", "accounts.json created: " + accountsFile.getAbsolutePath());
     }
 
     if (mbl2_button == null) return;
