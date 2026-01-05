@@ -132,23 +132,23 @@ private void launchGame() {
         }
         
         File xalDir = new File(requireActivity().getFilesDir(), "xal");
-        xalDir.mkdirs();
-        File accountsFile = new File(xalDir, "accounts.json");
-        
-        JSONObject accounts = new JSONObject();
-        JSONObject accountObj = new JSONObject();
-        accountObj.put("gamertag", active.gamertag != null ? active.gamertag : active.minecraftUsername);
-        accountObj.put("minecraftUsername", active.minecraftUsername);
-        accountObj.put("xuid", active.xuid);
-        accountObj.put("active", true);
-        
-        accounts.put("accounts", new JSONArray().put(accountObj));
-        
-        try (FileWriter writer = new FileWriter(accountsFile)) {
-            writer.write(accounts.toString(2));
-        }
-        Log.d("Xelo", "accounts.json created: " + accountsFile.getAbsolutePath());
-    }
+xalDir.mkdirs();
+File accountsFile = new File(xalDir, "accounts.json");
+
+JSONObject accountObj = new JSONObject();
+accountObj.put("gamertag", active.minecraftUsername);
+accountObj.put("minecraftUsername", active.minecraftUsername);
+accountObj.put("xuid", active.xuid);
+accountObj.put("active", true);
+
+JSONObject accounts = new JSONObject();
+accounts.put("accounts", new JSONArray().put(accountObj));
+
+try (FileWriter writer = new FileWriter(accountsFile)) {
+    writer.write(accounts.toString(2));
+}
+Log.d("Xelo", "accounts.json created: " + accountsFile.getAbsolutePath());
+}
 
     if (mbl2_button == null) return;
     mbl2_button.setEnabled(false);
