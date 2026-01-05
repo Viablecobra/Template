@@ -119,35 +119,39 @@ public class HomeFragment extends BaseThemedFragment {
 private void launchGame() {
     MsftAccountStore.MsftAccount active = getActiveAccount();
     if (active != null) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireActivity());
-        prefs.edit()
-            .putString("currentUser", active.minecraftUsername)
-            .putString("userId", active.xuid)
-            .apply();
-            
-        XboxDeviceKey deviceKey = XboxDeviceKey.restoreKeyAndId(requireActivity());
-        if (deviceKey != null) {
-            XalStorageManager storage = new XalStorageManager();
-            storage.saveDeviceIdentity(requireActivity(), deviceKey.getId(), deviceKey);
-        }
+    SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(requireActivity());
+    prefs.edit()
+        .putString("currentUser", active.minecraftUsername)
+        .putString("userId", active.xuid)
+        .apply();
         
-        File xalDir = new File(requireActivity().getFilesDir(), "xal");
-xalDir.mkdirs();
-File accountsFile = new File(xalDir, "accounts.json");
+    XboxDeviceKey deviceKey = XboxDeviceKey.restoreKeyAndId(requireActivity());
+    if (deviceKey != null) {
+        XalStorageManager storage = new XalStorageManager();
+        storage.saveDeviceIdentity(requireActivity(), deviceKey.getId(), deviceKey);
+    }
+    
+    File xalDir = new File(requireActivity().getFilesDir(), "xal");
+    xalDir.mkdirs();
+    File accountsFile = new File(xalDir, "accounts.json");
 
-JSONObject accountObj = new JSONObject();
-accountObj.put("gamertag", active.minecraftUsername);
-accountObj.put("minecraftUsername", active.minecraftUsername);
-accountObj.put("xuid", active.xuid);
-accountObj.put("active", true);
+    try {
+        JSONObject accountObj = new JSONObject();
+        accountObj.put("gamertag", active.minecraftUsername);
+        accountObj.put("minecraftUsername", active.minecraftUsername);
+        accountObj.put("xuid", active.xuid);
+        accountObj.put("active", true);
 
-JSONObject accounts = new JSONObject();
-accounts.put("accounts", new JSONArray().put(accountObj));
+        JSONObject accounts = new JSONObject();
+        accounts.put("accounts", new JSONArray().put(accountObj));
 
-try (FileWriter writer = new FileWriter(accountsFile)) {
-    writer.write(accounts.toString(2));
-}
-Log.d("Xelo", "accounts.json created: " + accountsFile.getAbsolutePath());
+        try (FileWriter writer = new FileWriter(accountsFile)) {
+            writer.write(accounts.toString(2));
+        }
+        Log.d("Xelo", "accounts.json created: " + accountsFile.getAbsolutePath());
+    } catch (JSONException | IOException e) {
+        Log.e("Xelo", "Failed to create accounts.json", e);
+    }
 }
 
     if (mbl2_button == null) return;
