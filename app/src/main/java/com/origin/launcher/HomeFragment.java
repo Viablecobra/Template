@@ -126,8 +126,8 @@ private void launchGame() {
             .apply();
         XboxDeviceKey deviceKey = XboxDeviceKey.restoreKeyAndId(requireActivity());
 if (deviceKey != null) {
-    XalStorageManager storage = new XalStorageManager(requireActivity());
-    storage.saveDeviceIdentity(deviceKey.getProofKey());
+    XalStorageManager storage = new XalStorageManager();
+    storage.saveDeviceIdentity(requireActivity(), deviceKey.getId(), deviceKey);
 }
     }
 
@@ -306,8 +306,8 @@ public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceStat
 
 XboxDeviceKey deviceKey = XboxDeviceKey.restoreKeyAndId(requireActivity());
 if (deviceKey != null) {
-    XalStorageManager storage = new XalStorageManager(requireActivity());
-    storage.saveDeviceIdentity(deviceKey.getProofKey());
+    XalStorageManager storage = new XalStorageManager();
+    storage.saveDeviceIdentity(requireActivity(), deviceKey.getId(), deviceKey);
 }
 
 accountLoginLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
