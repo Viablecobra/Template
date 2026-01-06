@@ -32,5 +32,9 @@
     <item name="android:gravity">center_horizontal</item>
     <item name="android:fontFamily">sans-serif</item>
 </style>
+<style name="PopupAccountSwitch_Animation">
+        <item name="android:windowEnterAnimation">@anim/popup_in</item>
+        <item name="android:windowExitAnimation">@anim/popup_out</item>
+    </style>
   
 </resources>

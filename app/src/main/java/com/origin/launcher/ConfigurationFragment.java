@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import com.google.android.material.materialswitch.MaterialSwitch;
 
 import com.origin.launcher.animation.DynamicAnim;
 import com.origin.launcher.Adapter.SettingsAdapter;
@@ -65,6 +66,7 @@ public class ConfigurationFragment extends BaseThemedFragment {
                         } catch (Throwable ignored) {}
                     }
             );
+            addSwitchItem(getString(R.string.launcher_managed_mc_login), fs.isLauncherManagedMcLoginEnabled(), (btn, checked) -> fs.setLauncherManagedMcLoginEnabled(checked));
         }));
 
         settingsRecyclerView.post(() ->
@@ -74,16 +76,17 @@ public class ConfigurationFragment extends BaseThemedFragment {
     }
 
     private void addSwitchItem(String label,
-                               boolean defChecked,
-                               Switch.OnCheckedChangeListener listener) {
-        View ll = LayoutInflater.from(requireContext())
-                .inflate(R.layout.item_settings_switch, settingsItemsContainer, false);
-        ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
-        Switch sw = ll.findViewById(R.id.switch_value);
-        sw.setChecked(defChecked);
-        if (listener != null) sw.setOnCheckedChangeListener(listener);
-        settingsItemsContainer.addView(ll);
-    }
+                           boolean defChecked,
+                           Switch.OnCheckedChangeListener listener) {
+    View ll = LayoutInflater.from(requireContext())
+            .inflate(R.layout.item_settings_switch, settingsItemsContainer, false);
+    ((TextView) ll.findViewById(R.id.tv_title)).setText(label);
+    MaterialSwitch sw = (MaterialSwitch) ll.findViewById(R.id.switch_value);
+    sw.setChecked(defChecked);
+    ThemeUtils.applyThemeToSwitch(sw, requireContext());
+    if (listener != null) sw.setOnCheckedChangeListener(listener);
+    settingsItemsContainer.addView(ll);
+}
 
     private Spinner addSpinnerItem(String label,
                                    String[] options,

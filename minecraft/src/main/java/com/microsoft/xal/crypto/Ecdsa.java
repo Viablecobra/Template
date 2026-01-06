@@ -42,7 +42,7 @@ public class Ecdsa {
                 takeover = obj.optBoolean("launcherManagedMcLoginEnabled", false);
             }
         } catch (Throwable ignored) {}
-        String name = takeover ? "org.levimc.xal.crypto" : "com.microsoft.xal.crypto";
+        String name = takeover ? "com.origin.launcher.xal.crypto" : "com.microsoft.xal.crypto";
         return context.getSharedPreferences(name, 0);
    }
 

@@ -143,7 +143,7 @@ public class MinecraftLauncher {
                     gameManager.loadLibrary("fmod");
                     gameManager.loadLibrary("MediaDecoders_Android");
                     gameManager.loadLibrary("minecraftpe");
-                    gameManager.loadLibrary("xelo");
+                    gameManager.loadLibrary("gxcore");
                     gameManager.loadLibrary("mtbinloader2");
                 }
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
