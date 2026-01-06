@@ -137,14 +137,20 @@ private void launchGame() {
     File accountsFile = new File(xalDir, "accounts.json");
 
     try {
-        JSONObject accountObj = new JSONObject();
-        accountObj.put("gamertag", active.minecraftUsername);
-        accountObj.put("minecraftUsername", active.minecraftUsername);
-        accountObj.put("xuid", active.xuid);
-        accountObj.put("active", true);
+        JSONObject profileObj = new JSONObject();
+profileObj.put("name", active.minecraftUsername);
+profileObj.put("id", active.xuid);
 
-        JSONObject accounts = new JSONObject();
-        accounts.put("accounts", new JSONArray().put(accountObj));
+JSONObject accountObj = new JSONObject();
+accountObj.put("displayName", active.minecraftUsername);
+accountObj.put("minecraftProfile", profileObj);
+accountObj.put("selectedProfile", 0);
+
+JSONArray accountsArray = new JSONArray();
+accountsArray.put(accountObj);
+
+JSONObject accounts = new JSONObject();
+accounts.put("accounts", accountsArray);
 
         try (FileWriter writer = new FileWriter(accountsFile)) {
             writer.write(accounts.toString(2));
