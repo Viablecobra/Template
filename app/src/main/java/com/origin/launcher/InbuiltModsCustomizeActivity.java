@@ -222,7 +222,8 @@ adapterContainer.setBackground(panelBg);
                     adapterContainer.setTranslationX(panelW);
                     adapterContainer.animate().translationX(0f).setDuration(duration).start();
 
-                                        float slide = panelW - dpToPx(16);
+                                        float slide = panelW;
+bottomButtons.animate().translationX(-slide).setDuration(duration).start();
                     bottomButtons.animate().translationX(-slide).setDuration(duration).start();
                 } else {
                     adapterContainer.animate().translationX(panelW).setDuration(duration).withEndAction(() -> {
