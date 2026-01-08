@@ -2,6 +2,7 @@ package com.origin.launcher;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,34 +10,34 @@ import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.materialswitch.MaterialSwitch;
+import com.origin.launcher.Adapter.InbuiltCustomizeAdapter;
+import com.origin.launcher.Adapter.InbuiltCustomizeAdapter.Item;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModManager;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModSizeStore;
 import com.origin.launcher.Launcher.inbuilt.model.ModIds;
 import com.origin.launcher.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
-
-    private enum SliderMode { SIZE, OPACITY }
+public class InbuiltModsCustomizeActivity extends BaseThemedActivity implements InbuiltCustomizeAdapter.Callback {
 
     private View lastSelectedButton;
-    private View sliderContainer;
-    private SeekBar sizeSeekBar;
-    private TextView sliderLabel;
     private MaterialSwitch lockSwitch;
+
     private final Map<String, Integer> modSizes = new HashMap<>();
     private final Map<String, Integer> modOpacity = new HashMap<>();
     private final Map<String, View> modButtons = new HashMap<>();
     private String lastSelectedId = null;
-    private SliderMode currentMode = SliderMode.SIZE;
 
     private static final int MIN_SIZE_DP = 32;
     private static final int MAX_SIZE_DP = 96;
@@ -48,15 +49,9 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
 
     private static final int SEEKBAR_MAX = 100;
 
-    private int sizeToProgress(int sizeDp) {
-        float t = (sizeDp - MIN_SIZE_DP) / (float) (MAX_SIZE_DP - MIN_SIZE_DP);
-        return Math.round(t * SEEKBAR_MAX);
-    }
-
-    private int progressToSize(int progress) {
-        float t = progress / (float) SEEKBAR_MAX;
-        return MIN_SIZE_DP + Math.round(t * (MAX_SIZE_DP - MIN_SIZE_DP));
-    }
+    private RecyclerView adapterRecyclerView;
+    private InbuiltCustomizeAdapter adapter;
+    private boolean isAdapterVisible = false;
 
     private int clampSize(int s) {
         return Math.max(MIN_SIZE_DP, Math.min(s, MAX_SIZE_DP));
@@ -77,13 +72,41 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
 
         Button resetButton = findViewById(R.id.reset_button);
         Button doneButton = findViewById(R.id.done_button);
-        Button sizeButton = findViewById(R.id.size_button);
-        Button opacityButton = findViewById(R.id.opacity_button);
+        Button customizeButton = findViewById(R.id.opacity_button);
+
         lockSwitch = findViewById(R.id.lock_button);
         FrameLayout grid = findViewById(R.id.inbuilt_buttons_grid);
-        sliderContainer = findViewById(R.id.slider_container);
-        sizeSeekBar = findViewById(R.id.size_seekbar);
-        sliderLabel = findViewById(R.id.slider_label);
+
+        customizeButton.setText("Customize");
+
+        adapter = new InbuiltCustomizeAdapter(
+                this,
+                MIN_SIZE_DP, MAX_SIZE_DP,
+                MIN_OPACITY, MAX_OPACITY,
+                SEEKBAR_MAX
+        );
+
+        adapterRecyclerView = new RecyclerView(this);
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+                dpToPx(240),
+                FrameLayout.LayoutParams.MATCH_PARENT
+        );
+        params.gravity = Gravity.END | Gravity.CENTER_VERTICAL;
+        params.rightMargin = dpToPx(16);
+        params.topMargin = dpToPx(16);
+        params.bottomMargin = dpToPx(96);
+        adapterRecyclerView.setLayoutParams(params);
+        adapterRecyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
+        adapterRecyclerView.setAdapter(adapter);
+        adapterRecyclerView.setVisibility(View.GONE);
+
+        View bg = findViewById(R.id.customize_background);
+        if (bg instanceof ViewGroup) {
+            ((ViewGroup) bg).addView(adapterRecyclerView);
+        } else {
+            View root = findViewById(android.R.id.content);
+            if (root instanceof ViewGroup) ((ViewGroup) root).addView(adapterRecyclerView);
+        }
 
         ThemeUtils.applyThemeToSwitch(lockSwitch, this);
         lockSwitch.setOnCheckedChangeListener((buttonView, isChecked) -> {
@@ -92,10 +115,8 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             }
         });
 
-        sizeSeekBar.setMax(SEEKBAR_MAX);
-
-        View root = findViewById(R.id.customize_background);
-        root.setOnTouchListener((v, event) -> {
+        View rootTouch = findViewById(R.id.customize_background);
+        rootTouch.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_DOWN) {
                 lastSelectedButton = null;
                 lastSelectedId = null;
@@ -103,6 +124,7 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             }
             return false;
         });
+
         InbuiltModSizeStore.getInstance().init(getApplicationContext());
 
         addModButton(grid, R.drawable.ic_sprint, ModIds.AUTO_SPRINT);
@@ -127,25 +149,29 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             s = clampSize(s <= 0 ? DEFAULT_SIZE_DP : s);
             e.setValue(s);
         }
+
         for (Map.Entry<String, Integer> e : modOpacity.entrySet()) {
             int o = e.getValue();
             o = clampOpacity(o <= 0 ? DEFAULT_OPACITY : o);
             e.setValue(o);
         }
 
-        int initialSize = clampSize(DEFAULT_SIZE_DP);
-        sizeSeekBar.setProgress(sizeToProgress(initialSize));
-        sliderContainer.setVisibility(View.VISIBLE);
-        currentMode = SliderMode.SIZE;
-        sliderLabel.setText("Size");
-        lastSelectedButton = null;
-        lastSelectedId = null;
+        adapter.submitList(getEnabledMods());
 
-        resetButton.setOnClickListener(v -> resetAll(grid));
+        customizeButton.setOnClickListener(v -> {
+            isAdapterVisible = !isAdapterVisible;
+            adapterRecyclerView.setVisibility(isAdapterVisible ? View.VISIBLE : View.GONE);
+        });
+
+        resetButton.setOnClickListener(v -> {
+            resetAll(grid);
+            adapter.notifyDataSetChanged();
+        });
 
         doneButton.setOnClickListener(v -> {
             Intent result = new Intent();
             InbuiltModManager manager = InbuiltModManager.getInstance(this);
+
             for (Map.Entry<String, Integer> e : modSizes.entrySet()) {
                 String id = e.getKey();
                 int sizeDp = e.getValue();
@@ -154,69 +180,79 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
 
                 View btn = modButtons.get(id);
                 if (btn != null) {
-                    float x = btn.getX();
-                    float y = btn.getY();
-                    result.putExtra("posx_" + id, x);
-                    result.putExtra("posy_" + id, y);
+                    result.putExtra("posx_" + id, btn.getX());
+                    result.putExtra("posy_" + id, btn.getY());
                 }
             }
+
             for (Map.Entry<String, Integer> e : modOpacity.entrySet()) {
                 String id = e.getKey();
                 int opacity = e.getValue();
                 result.putExtra("opacity_" + id, opacity);
             }
+
             setResult(RESULT_OK, result);
             finish();
         });
+    }
 
-        sizeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (lastSelectedButton == null || lastSelectedId == null) return;
+    @NonNull
+private List<InbuiltCustomizeAdapter.Item> getEnabledMods() {
+    List<InbuiltCustomizeAdapter.Item> list = new ArrayList<>();
+    InbuiltModManager manager = InbuiltModManager.getInstance(this);
+    
+    if (manager.isModAdded(ModIds.AUTO_SPRINT))
+        list.add(new InbuiltCustomizeAdapter.Item(ModIds.AUTO_SPRINT, R.drawable.ic_sprint));
+    if (manager.isModAdded(ModIds.QUICK_DROP))
+        list.add(new InbuiltCustomizeAdapter.Item(ModIds.QUICK_DROP, R.drawable.ic_quick_drop));
+    if (manager.isModAdded(ModIds.TOGGLE_HUD))
+        list.add(new InbuiltCustomizeAdapter.Item(ModIds.TOGGLE_HUD, R.drawable.ic_hud));
+    if (manager.isModAdded(ModIds.CAMERA_PERSPECTIVE))
+        list.add(new InbuiltCustomizeAdapter.Item(ModIds.CAMERA_PERSPECTIVE, R.drawable.ic_camera));
+    
+    return list;
+}
 
-                if (currentMode == SliderMode.SIZE) {
-                    int sizeDp = clampSize(progressToSize(progress));
-                    int sizePx = dpToPx(sizeDp);
-                    ViewGroup.LayoutParams lp = lastSelectedButton.getLayoutParams();
-                    lp.width = sizePx;
-                    lp.height = sizePx;
-                    lastSelectedButton.setLayoutParams(lp);
-                    modSizes.put(lastSelectedId, sizeDp);
-                } else if (currentMode == SliderMode.OPACITY) {
-                    int opacity = clampOpacity(progress * MAX_OPACITY / SEEKBAR_MAX);
-                    lastSelectedButton.setAlpha(opacity / 100f);
-                    modOpacity.put(lastSelectedId, opacity);
-                }
-            }
+    @Override
+    public int getSizeDp(String id) {
+        return clampSize(modSizes.getOrDefault(id, DEFAULT_SIZE_DP));
+    }
 
-            @Override public void onStartTrackingTouch(SeekBar seekBar) { }
+    @Override
+    public int getOpacity(String id) {
+        return clampOpacity(modOpacity.getOrDefault(id, DEFAULT_OPACITY));
+    }
 
-            @Override public void onStopTrackingTouch(SeekBar seekBar) { }
-        });
+    @Override
+    public void onSizeChanged(String id, int sizeDp) {
+        int clamped = clampSize(sizeDp);
+        modSizes.put(id, clamped);
 
-        sizeButton.setOnClickListener(v -> {
-            currentMode = SliderMode.SIZE;
-            sliderLabel.setText("Size");
-            if (lastSelectedId != null) {
-                int sizeDp = modSizes.getOrDefault(lastSelectedId, DEFAULT_SIZE_DP);
-                sizeSeekBar.setProgress(sizeToProgress(sizeDp));
-            } else {
-                sizeSeekBar.setProgress(sizeToProgress(DEFAULT_SIZE_DP));
-            }
-            sizeSeekBar.invalidate();
-        });
+        View btn = modButtons.get(id);
+        if (btn != null) {
+            int px = dpToPx(clamped);
+            ViewGroup.LayoutParams lp = btn.getLayoutParams();
+            lp.width = px;
+            lp.height = px;
+            btn.setLayoutParams(lp);
+        }
+    }
 
-        opacityButton.setOnClickListener(v -> {
-            currentMode = SliderMode.OPACITY;
-            sliderLabel.setText("Opacity");
-            if (lastSelectedId != null) {
-                int opacity = modOpacity.getOrDefault(lastSelectedId, DEFAULT_OPACITY);
-                sizeSeekBar.setProgress(opacity * SEEKBAR_MAX / MAX_OPACITY);
-            } else {
-                sizeSeekBar.setProgress(DEFAULT_OPACITY * SEEKBAR_MAX / MAX_OPACITY);
-            }
-            sizeSeekBar.invalidate();
-        });
+    @Override
+    public void onOpacityChanged(String id, int opacity) {
+        int clamped = clampOpacity(opacity);
+        modOpacity.put(id, clamped);
+
+        View btn = modButtons.get(id);
+        if (btn != null) {
+            btn.setAlpha(clamped / 100f);
+        }
+    }
+
+    @Override
+    public void onItemClicked(String id) {
+        View btn = modButtons.get(id);
+        if (btn != null) btn.performClick();
     }
 
     private void addModButton(FrameLayout grid, int iconResId, String id) {
@@ -226,12 +262,13 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         btn.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
 
         InbuiltModManager manager = InbuiltModManager.getInstance(this);
+
         int savedSizeDp = manager.getOverlayButtonSize(id);
         if (savedSizeDp <= 0) savedSizeDp = DEFAULT_SIZE_DP;
         savedSizeDp = clampSize(savedSizeDp);
         int sizePx = dpToPx(savedSizeDp);
 
-        int savedOpacity = InbuiltModManager.getInstance(this).getOverlayButtonOpacity(id);
+        int savedOpacity = manager.getOverlayButtonOpacity(id);
         if (savedOpacity <= 0) savedOpacity = DEFAULT_OPACITY;
         savedOpacity = clampOpacity(savedOpacity);
 
@@ -252,28 +289,7 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
         btn.setOnClickListener(v -> {
             lastSelectedButton = v;
             lastSelectedId = id;
-            if (lockSwitch != null) {
-                lockSwitch.setChecked(InbuiltModSizeStore.getInstance().isLocked(id));
-            }
-
-            if (currentMode == SliderMode.SIZE) {
-                int sizeDp = modSizes.getOrDefault(id, DEFAULT_SIZE_DP);
-                sizeDp = clampSize(sizeDp);
-                int sizePx2 = dpToPx(sizeDp);
-                ViewGroup.LayoutParams lp2 = v.getLayoutParams();
-                lp2.width = sizePx2;
-                lp2.height = sizePx2;
-                v.setLayoutParams(lp2);
-                modSizes.put(id, sizeDp);
-                sizeSeekBar.setProgress(sizeToProgress(sizeDp));
-            } else if (currentMode == SliderMode.OPACITY) {
-                int opacity = modOpacity.getOrDefault(id, DEFAULT_OPACITY);
-                opacity = clampOpacity(opacity);
-                v.setAlpha(opacity / 100f);
-                modOpacity.put(id, opacity);
-                sizeSeekBar.setProgress(opacity * SEEKBAR_MAX / MAX_OPACITY);
-            }
-            sizeSeekBar.invalidate();
+            lockSwitch.setChecked(InbuiltModSizeStore.getInstance().isLocked(id));
         });
 
         btn.setOnTouchListener(new View.OnTouchListener() {
@@ -340,18 +356,15 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity {
             c.setY(0f);
             c.setAlpha(defaultOpacity / 100f);
         }
-        for (String key : modSizes.keySet()) {
-            modSizes.put(key, defaultSizeDp);
-        }
-        for (String key : modOpacity.keySet()) {
-            modOpacity.put(key, defaultOpacity);
-        }
+
+        for (String key : modSizes.keySet()) modSizes.put(key, defaultSizeDp);
+        for (String key : modOpacity.keySet()) modOpacity.put(key, defaultOpacity);
+
         lastSelectedButton = null;
         lastSelectedId = null;
         lockSwitch.setChecked(false);
-        currentMode = SliderMode.SIZE;
-        sliderLabel.setText("Size");
-        sizeSeekBar.setProgress(sizeToProgress(defaultSizeDp));
-        sizeSeekBar.invalidate();
+
+        isAdapterVisible = false;
+        adapterRecyclerView.setVisibility(View.GONE);
     }
 }
