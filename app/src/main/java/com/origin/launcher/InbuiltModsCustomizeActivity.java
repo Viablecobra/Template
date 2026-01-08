@@ -224,7 +224,7 @@ adapterContainer.layout(0, 0, adapterContainer.getMeasuredWidth(), adapterContai
                     adapterContainer.setTranslationX(panelW);
                     adapterContainer.animate().translationX(0f).setDuration(duration).start();
 
-                                        float slide = panelW - dpToPx(50);
+                                        float slide = panelW - dpToPx(65);
 bottomButtons.animate().translationX(-slide).setDuration(duration).start();
                     bottomButtons.animate().translationX(-slide).setDuration(duration).start();
                 } else {
