@@ -5,6 +5,7 @@ public final class ModIds {
     public static final String CAMERA_PERSPECTIVE = "camera_perspective";
     public static final String TOGGLE_HUD = "toggle_hud";
     public static final String AUTO_SPRINT = "auto_sprint";
+    public static final String ZOOM = "zoom";
 
     private ModIds() {}
 }

@@ -65,6 +65,8 @@
     <string name="autosprint_key_shift">Shift</string>
     <string name="autosprint_key_label">Sprint Key:</string>
     <string name="configure">Configure</string>
+    <string name="inbuilt_mod_zoom">Zoom</string>
+    <string name="inbuilt_mod_zoom_desc">Hold to zoom in, like OptiFine zoom</string>
 
 <!-- ResourcepackHandler -->
 <string name="resourcepack_detected_title">Resource Pack Detected</string>

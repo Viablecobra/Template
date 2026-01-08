@@ -73,6 +73,9 @@ public class InbuiltModManager {
                 true,
                 addedMods.contains(ModIds.AUTO_SPRINT)
         ));
+        mods.add(new InbuiltMod(ModIds.ZOOM,
+            context.getString(R.string.inbuilt_mod_zoom),
+            context.getString(R.string.inbuilt_mod_zoom_desc), false, addedMods.contains(ModIds.ZOOM)));
         return mods;
     }
 

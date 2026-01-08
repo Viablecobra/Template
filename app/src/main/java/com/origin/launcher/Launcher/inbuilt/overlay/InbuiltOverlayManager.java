@@ -67,6 +67,13 @@ public class InbuiltOverlayManager {
             overlays.add(overlay);
             nextY += SPACING;
         }
+        if (manager.isModAdded(ModIds.ZOOM)) {
+            int[] pos = getStartPosition(ModIds.ZOOM, START_X, nextY);
+            ZoomOverlay overlay = new ZoomOverlay(activity);
+            overlay.show(pos[0], pos[1]);
+            overlays.add(overlay);
+            nextY += SPACING;
+        }
     }
 
     public void hideAllOverlays() {

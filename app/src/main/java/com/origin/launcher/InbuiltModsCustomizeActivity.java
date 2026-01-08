@@ -180,6 +180,7 @@ adapterContainer.layout(0, 0, adapterContainer.getMeasuredWidth(), adapterContai
         addModButton(grid, R.drawable.ic_quick_drop, ModIds.QUICK_DROP);
         addModButton(grid, R.drawable.ic_hud, ModIds.TOGGLE_HUD);
         addModButton(grid, R.drawable.ic_camera, ModIds.CAMERA_PERSPECTIVE);
+        addModButton(grid, R.drawable.ic_zoom, ModIds.ZOOM);
 
         InbuiltModSizeStore sizeStore = InbuiltModSizeStore.getInstance();
         for (Map.Entry<String, View> e : modButtons.entrySet()) {
@@ -283,6 +284,8 @@ bottomButtons.animate().translationX(-slide).setDuration(duration).start();
             list.add(new InbuiltCustomizeAdapter.Item(ModIds.TOGGLE_HUD, R.drawable.ic_hud));
         if (manager.isModAdded(ModIds.CAMERA_PERSPECTIVE))
             list.add(new InbuiltCustomizeAdapter.Item(ModIds.CAMERA_PERSPECTIVE, R.drawable.ic_camera));
+        if (manager.isModAdded(ModIds.ZOOM))
+            list.add(new InbuiltCustomizeAdapter.Item(ModIds.ZOOM, R.drawable.ic_zoom));
         
         return list;
     }
