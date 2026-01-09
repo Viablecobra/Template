@@ -3,15 +3,12 @@
     android:height="24dp"
     android:viewportWidth="48"
     android:viewportHeight="24">
-  
   <path android:fillColor="#CC000000"
         android:pathData="M4,2 Q2,2 2,4 L2,20 Q2,22 4,22 L44,22 Q46,22 46,20 L46,4 Q46,2 44,2 Z"/>
-  
   <text android:x="6"
         android:y="17"
-        android:textSize="10" 
-        android:fillColor="#FFFFFF"
+        android:textSize="10"
         android:fontFamily="monospace"
-        font-weight="normal"
+        android:fillColor="#FFFFFF"
         android:text="CPS:5"/>
 </vector>
