@@ -5,6 +5,8 @@ import android.app.Activity;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModManager;
 import com.origin.launcher.Launcher.inbuilt.manager.InbuiltModSizeStore;
 import com.origin.launcher.Launcher.inbuilt.model.ModIds;
+import com.origin.launcher.Launcher.inbuilt.overlay.FpsDisplayOverlay;
+import com.origin.launcher.Launcher.inbuilt.overlay.CpsDisplayOverlay;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +18,8 @@ public class InbuiltOverlayManager {
     private int nextY = 150;
     private static final int SPACING = 70;
     private static final int START_X = 50;
+    private FpsDisplayOverlay fpsDisplayOverlay;
+    private CpsDisplayOverlay cpsDisplayOverlay;
 
     public InbuiltOverlayManager(Activity activity) {
         this.activity = activity;
@@ -65,6 +69,23 @@ public class InbuiltOverlayManager {
             AutoSprintOverlay overlay = new AutoSprintOverlay(activity, manager.getAutoSprintKey());
             overlay.show(pos[0], pos[1]);
             overlays.add(overlay);
+            nextY += SPACING;
+        }
+        if (manager.isModAdded(ModIds.ZOOM)) {
+            int[] pos = getStartPosition(ModIds.ZOOM, START_X, nextY);
+            ZoomOverlay overlay = new ZoomOverlay(activity);
+            overlay.show(pos[0], pos[1]);
+            overlays.add(overlay);
+            nextY += SPACING;
+        }
+        if (manager.isModAdded(ModIds.FPS_DISPLAY)) {
+            fpsDisplayOverlay = new FpsDisplayOverlay(activity);
+            fpsDisplayOverlay.show(START_X, nextY);
+            nextY += SPACING;
+        }
+        if (manager.isModAdded(ModIds.CPS_DISPLAY)) {
+            cpsDisplayOverlay = new CpsDisplayOverlay(activity);
+            cpsDisplayOverlay.show(START_X, nextY);
             nextY += SPACING;
         }
     }
