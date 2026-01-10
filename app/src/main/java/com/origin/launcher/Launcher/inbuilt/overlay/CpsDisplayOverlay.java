@@ -62,11 +62,11 @@ public class CpsDisplayOverlay {
         this.windowManager = (WindowManager) activity.getSystemService(Context.WINDOW_SERVICE);
         this.sizeStore = InbuiltModSizeStore.getInstance();
         sizeStore.init(activity.getApplicationContext());
-        setupGameInputListener();
     }
 
     private void setupGameInputListener() {
         View decorView = activity.getWindow().getDecorView();
+        decorView.setOnTouchListener(null);
         decorView.setOnTouchListener((v, event) -> {
             if (isShowing) {
                 int action = event.getActionMasked();
@@ -144,6 +144,7 @@ public class CpsDisplayOverlay {
             overlayView.setOnTouchListener(this::handleTouch);
             windowManager.addView(overlayView, wmParams);
             isShowing = true;
+            setupGameInputListener();
             handler.post(updateRunnable);
         } catch (Exception e) {
             showFallback(startX, startY);
@@ -178,6 +179,7 @@ public class CpsDisplayOverlay {
         overlayView.setOnTouchListener(this::handleTouchFallback);
         rootView.addView(overlayView, params);
         isShowing = true;
+        setupGameInputListener();
         wmParams = null;
         handler.post(updateRunnable);
     }
@@ -283,6 +285,8 @@ public class CpsDisplayOverlay {
                 }
             }
         } catch (Exception ignored) {}
+        View decorView = activity.getWindow().getDecorView();
+        decorView.setOnTouchListener(null);
         overlayView = null;
         statsText = null;
         synchronized (clickTimes) {
