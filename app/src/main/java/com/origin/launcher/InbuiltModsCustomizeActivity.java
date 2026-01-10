@@ -52,6 +52,8 @@ public class InbuiltModsCustomizeActivity extends BaseThemedActivity implements 
     private static final int DEFAULT_OPACITY = 100;
 
     private static final int SEEKBAR_MAX = 100;
+    
+    private final Map<String, Integer> modZoomLevels = new HashMap<>();
 
     private RecyclerView adapterRecyclerView;
     private InbuiltCustomizeAdapter adapter;
@@ -182,7 +184,6 @@ adapterContainer.layout(0, 0, adapterContainer.getMeasuredWidth(), adapterContai
         addModButton(grid, R.drawable.ic_hud, ModIds.TOGGLE_HUD);
         addModButton(grid, R.drawable.ic_camera, ModIds.CAMERA_PERSPECTIVE);
         addModButton(grid, R.drawable.ic_zoom, ModIds.ZOOM);
-        addModButton(grid, R.drawable.ic_cps_preview, ModIds.CPS_DISPLAY);
 
         InbuiltModSizeStore sizeStore = InbuiltModSizeStore.getInstance();
         for (Map.Entry<String, View> e : modButtons.entrySet()) {
@@ -267,6 +268,10 @@ bottomButtons.animate().translationX(-slide).setDuration(duration).start();
                 int opacity = e.getValue();
                 result.putExtra("opacity_" + id, opacity);
             }
+            
+            if (modZoomLevels.containsKey(ModIds.ZOOM)) {
+                manager.setZoomLevel(modZoomLevels.get(ModIds.ZOOM));
+            }
 
             setResult(RESULT_OK, result);
             finish();
@@ -288,10 +293,7 @@ bottomButtons.animate().translationX(-slide).setDuration(duration).start();
             list.add(new InbuiltCustomizeAdapter.Item(ModIds.CAMERA_PERSPECTIVE, R.drawable.ic_camera));
         if (manager.isModAdded(ModIds.ZOOM))
             list.add(new InbuiltCustomizeAdapter.Item(ModIds.ZOOM, R.drawable.ic_zoom));
-        if (manager.isModAdded(ModIds.CPS_DISPLAY))
-            list.add(new InbuiltCustomizeAdapter.Item(ModIds.CPS_DISPLAY, R.drawable.ic_cps_preview));
-        
-        
+
         return list;
     }
 
@@ -329,6 +331,16 @@ bottomButtons.animate().translationX(-slide).setDuration(duration).start();
         if (btn != null) {
             btn.setAlpha(clamped / 100f);
         }
+    }
+    
+    @Override
+    public int getZoomLevel(String id) {
+    return modZoomLevels.getOrDefault(id, 100);
+    }
+    
+    @Override
+    public void onZoomChanged(String id, int zoomLevel) {
+    modZoomLevels.put(id, zoomLevel);
     }
 
     @Override
@@ -448,5 +460,7 @@ bottomButtons.animate().translationX(-slide).setDuration(duration).start();
 
         isAdapterVisible = false;
         adapterContainer.setVisibility(View.GONE);
+        modZoomLevels.clear();
+        modZoomLevels.put(ModIds.ZOOM, 100);
     }
 }
