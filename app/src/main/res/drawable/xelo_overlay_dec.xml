@@ -1,0 +1,16 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:width="30dp"
+        android:drawable="@android:color/transparent"/>
+
+    <item
+        android:gravity="center_vertical|right"
+        android:left="16dp"
+        android:drawable="@drawable/overlay_stats_background"/>
+
+    <item
+        android:gravity="center_vertical|left"
+        android:drawable="@drawable/ic_xelo_vector"/>
+
+</layer-list>
