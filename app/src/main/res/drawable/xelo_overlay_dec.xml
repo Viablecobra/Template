@@ -2,7 +2,7 @@
 
     <item
         android:width="30dp"
-        android:drawable="@color/transparent"/>
+        android:drawable="@android:color/transparent"/>
 
     <item
         android:gravity="center_vertical|right"
