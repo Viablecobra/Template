@@ -5,9 +5,15 @@ import android.content.Context;
 public class FeatureSettings {
     private static volatile FeatureSettings INSTANCE;
     private static Context appContext;
+    private static volatile boolean libraryLoaded = false;
+    
     private boolean versionIsolationEnabled = false;
     private boolean logcatOverlayEnabled = false;
     
+    private native void setAutofixVersionsNative(String[] versions);
+    private native void setLightmapAutofixerNative(boolean enabled);
+    private native void setTextureLodAutofixerNative(boolean enabled);
+
     public native void setAutofixVersions(String[] versions);
     public native void setLightmapAutofixer(boolean enabled);
     public native void setTextureLodAutofixer(boolean enabled);
@@ -34,6 +40,40 @@ public class FeatureSettings {
             }
         }
         return INSTANCE;
+    }
+
+    private static void ensureLibraryLoaded() {
+        if (!libraryLoaded) {
+            synchronized (FeatureSettings.class) {
+                if (!libraryLoaded) {
+                    try {
+                        System.loadLibrary("mtbinloader2");
+                        libraryLoaded = true;
+                    } catch (Throwable ignored) {}
+                }
+            }
+        }
+    }
+
+    public void setAutofixVersionsSafe(String[] versions) {
+        ensureLibraryLoaded();
+        if (libraryLoaded) {
+            setAutofixVersionsNative(versions);
+        }
+    }
+
+    public void setLightmapAutofixerSafe(boolean enabled) {
+        ensureLibraryLoaded();
+        if (libraryLoaded) {
+            setLightmapAutofixerNative(enabled);
+        }
+    }
+
+    public void setTextureLodAutofixerSafe(boolean enabled) {
+        ensureLibraryLoaded();
+        if (libraryLoaded) {
+            setTextureLodAutofixerNative(enabled);
+        }
     }
 
     public boolean isVersionIsolationEnabled() { return versionIsolationEnabled; }
