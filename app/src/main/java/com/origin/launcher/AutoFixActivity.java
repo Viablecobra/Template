@@ -87,7 +87,7 @@ public class AutoFixActivity extends AppCompatActivity {
                 selected.add(versions[checked.keyAt(i)]);
             }
         }
-        FeatureSettings.getInstance().setAutofixVersions(selected.toArray(new String[0]));
+        FeatureSettings.getInstance().setAutofixVersionsSafe(selected.toArray(new String[0]));
     }
     
     private void saveVersions(Bundle outState) {

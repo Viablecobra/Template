@@ -1,6 +1,7 @@
 package com.origin.launcher;
 
 import android.content.Context;
+import android.util.Log;
 
 public class FeatureSettings {
     private static volatile FeatureSettings INSTANCE;
@@ -10,10 +11,6 @@ public class FeatureSettings {
     private boolean versionIsolationEnabled = false;
     private boolean logcatOverlayEnabled = false;
     
-    private native void setAutofixVersionsNative(String[] versions);
-    private native void setLightmapAutofixerNative(boolean enabled);
-    private native void setTextureLodAutofixerNative(boolean enabled);
-
     public native void setAutofixVersions(String[] versions);
     public native void setLightmapAutofixer(boolean enabled);
     public native void setTextureLodAutofixer(boolean enabled);
@@ -58,21 +55,21 @@ public class FeatureSettings {
     public void setAutofixVersionsSafe(String[] versions) {
         ensureLibraryLoaded();
         if (libraryLoaded) {
-            setAutofixVersionsNative(versions);
+            setAutofixVersions(versions);
         }
     }
 
     public void setLightmapAutofixerSafe(boolean enabled) {
         ensureLibraryLoaded();
         if (libraryLoaded) {
-            setLightmapAutofixerNative(enabled);
+            setLightmapAutofixer(enabled);
         }
     }
 
     public void setTextureLodAutofixerSafe(boolean enabled) {
         ensureLibraryLoaded();
         if (libraryLoaded) {
-            setTextureLodAutofixerNative(enabled);
+            setTextureLodAutofixer(enabled);
         }
     }
 
