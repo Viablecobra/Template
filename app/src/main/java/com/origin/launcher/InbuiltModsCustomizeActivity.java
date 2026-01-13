@@ -520,9 +520,4 @@ public void showKeybindDialog(String modId) {
            (keyCode >= KeyEvent.KEYCODE_0 && keyCode <= KeyEvent.KEYCODE_9) ||
            keyCode == KeyEvent.KEYCODE_SPACE || keyCode == KeyEvent.KEYCODE_ENTER;
     }
-    private String getKeyName(int keyCode) {
-    if (keyCode == KeyEvent.KEYCODE_C) return "C";
-    String label = KeyEvent.keyCodeToString(keyCode);
-    return label.startsWith("KEYCODE_") ? label.substring(8) : label;
-    }
 }
