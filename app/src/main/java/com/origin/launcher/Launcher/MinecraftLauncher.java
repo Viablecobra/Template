@@ -147,7 +147,7 @@ if (!shouldLoadPlayFab(version)) {
                     gameManager.loadLibrary("MediaDecoders_Android");
                     gameManager.loadLibrary("minecraftpe");
                     gameManager.loadLibrary("xelo");
-                    gameManager.loadLibrary("mtbinloader2");
+                    gameManager.loadLibrary("libmtbinloader2");
                 }
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
 
