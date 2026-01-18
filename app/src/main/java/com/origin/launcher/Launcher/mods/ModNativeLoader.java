@@ -18,7 +18,6 @@ public class ModNativeLoader {
     
     @SuppressLint("UnsafeDynamicallyLoadedCode")
     public static void loadEnabledSoMods(ModManager modManager, File cacheDir) {
-        XeloMod.loadLibrary();
         
         List<Mod> mods = modManager.getMods();
         for (Mod mod : mods) {
