@@ -1,6 +1,6 @@
 package com.origin.launcher;
 
-public class InbuiltModsNative {
+public class XeloMod {
     private static boolean libraryLoaded = false;
 
     public static synchronized boolean loadLibrary() {
