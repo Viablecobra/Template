@@ -15,6 +15,8 @@ import com.origin.launcher.FeatureSettings;
 import com.origin.launcher.LoadingDialog;
 import android.util.Log;
 
+import com.origin.launcher.XeloMod;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -149,6 +151,8 @@ if (!shouldLoadPlayFab(version)) {
                     gameManager.loadLibrary("xelo");
                 }
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
+                
+                XeloMod.loadLibrary();
 
                 activity.runOnUiThread(() -> {
                     dismissLoading();
