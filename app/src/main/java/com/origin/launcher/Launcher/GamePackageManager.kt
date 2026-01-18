@@ -30,14 +30,15 @@ class GamePackageManager private constructor(private val context: Context, priva
         "libMediaDecoders_Android.so",
         "libmaesdk.so",
         "libHttpClient.Android.so",
-        "libminecraftpe.so",
-        "libmtbinloader2.so"
+        "libminecraftpe.so"
     )
 
     private val systemLoadedLibs = arrayOf(
         "libpairipcore.so",
         "libPlayFabMultiplayer.so",
         "libxelo.so",
+        "libmtbinloader2.so",
+        "libmtbinloader2.so",
     )
 
     init {
