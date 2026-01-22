@@ -108,6 +108,7 @@
             android:excludeFromRecents="false"
             android:exported="true"
             android:launchMode="singleTask"
+            android:taskAffinity="com.origin.launcher.Launcher"
             android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
             tools:ignore="DiscouragedApi">
             <meta-data
@@ -158,6 +159,7 @@
             android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:alwaysRetainTaskState="true"
+            android:taskAffinity="com.origin.launcher.Launcher"
             tools:replace="android:configChanges,android:exported">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
@@ -175,6 +177,7 @@
             android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:alwaysRetainTaskState="true"
+            android:taskAffinity="com.origin.launcher.Launcher"
             tools:replace="android:configChanges,android:exported" />
 
         <activity
@@ -183,6 +186,7 @@
             android:launchMode="singleTask"
             android:configChanges="keyboardHidden|orientation|screenSize|uiMode"
             android:alwaysRetainTaskState="true"
+            android:taskAffinity="com.origin.launcher.Launcher"
             tools:replace="android:configChanges,android:exported" />
 
         <activity
