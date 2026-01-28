@@ -53,10 +53,10 @@ repositories {
     }
     
     beta {
-        initWith debug
-        applicationIdSuffix ".beta"
-        matchingFallbacks = ['debug']  
-        versionNameSuffix "-beta"
+    initWith release
+    applicationIdSuffix ".beta"
+    matchingFallbacks = ["release"]
+    versionNameSuffix "-beta"
     }
 }
 

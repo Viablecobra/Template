@@ -182,11 +182,11 @@ adapterContainer.layout(0, 0, adapterContainer.getMeasuredWidth(), adapterContai
 
         InbuiltModSizeStore.getInstance().init(getApplicationContext());
 
-        addModButton(grid, R.drawable.ic_sprint, ModIds.AUTO_SPRINT);
-        addModButton(grid, R.drawable.ic_quick_drop, ModIds.QUICK_DROP);
-        addModButton(grid, R.drawable.ic_hud, ModIds.TOGGLE_HUD);
-        addModButton(grid, R.drawable.ic_camera, ModIds.CAMERA_PERSPECTIVE);
-        addModButton(grid, R.drawable.ic_zoom, ModIds.ZOOM);
+        addModButton(grid, R.drawable.as_unpress, ModIds.AUTO_SPRINT);
+        addModButton(grid, R.drawable.q_unpress, ModIds.QUICK_DROP);
+        addModButton(grid, R.drawable.f1_unpress, ModIds.TOGGLE_HUD);
+        addModButton(grid, R.drawable.f5_unpress, ModIds.CAMERA_PERSPECTIVE);
+        addModButton(grid, R.drawable.zoom_unpress, ModIds.ZOOM);
 
         InbuiltModSizeStore sizeStore = InbuiltModSizeStore.getInstance();
         for (Map.Entry<String, View> e : modButtons.entrySet()) {
@@ -291,15 +291,15 @@ bottomButtons.animate().translationX(-slide).setDuration(duration).start();
         InbuiltModManager manager = InbuiltModManager.getInstance(this);
         
         if (manager.isModAdded(ModIds.AUTO_SPRINT))
-            list.add(new InbuiltCustomizeAdapter.Item(ModIds.AUTO_SPRINT, R.drawable.ic_sprint));
+            list.add(new InbuiltCustomizeAdapter.Item(ModIds.AUTO_SPRINT, R.drawable.as_unpress));
         if (manager.isModAdded(ModIds.QUICK_DROP))
-            list.add(new InbuiltCustomizeAdapter.Item(ModIds.QUICK_DROP, R.drawable.ic_quick_drop));
+            list.add(new InbuiltCustomizeAdapter.Item(ModIds.QUICK_DROP, R.drawable.q_unpress));
         if (manager.isModAdded(ModIds.TOGGLE_HUD))
-            list.add(new InbuiltCustomizeAdapter.Item(ModIds.TOGGLE_HUD, R.drawable.ic_hud));
+            list.add(new InbuiltCustomizeAdapter.Item(ModIds.TOGGLE_HUD, R.drawable.f1_unpress));
         if (manager.isModAdded(ModIds.CAMERA_PERSPECTIVE))
-            list.add(new InbuiltCustomizeAdapter.Item(ModIds.CAMERA_PERSPECTIVE, R.drawable.ic_camera));
+            list.add(new InbuiltCustomizeAdapter.Item(ModIds.CAMERA_PERSPECTIVE, R.drawable.f5_unpress));
         if (manager.isModAdded(ModIds.ZOOM)) {
-    InbuiltCustomizeAdapter.Item zoomItem = new InbuiltCustomizeAdapter.Item(ModIds.ZOOM, R.drawable.ic_zoom);
+    InbuiltCustomizeAdapter.Item zoomItem = new InbuiltCustomizeAdapter.Item(ModIds.ZOOM, R.drawable.zoom_unpress);
     int savedZoom = manager.getZoomLevel();
     int savedKeybind = manager.getZoomKeybind();
     list.add(zoomItem);
