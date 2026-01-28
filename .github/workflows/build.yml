@@ -110,15 +110,23 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Run Tests
-        run: ./gradlew testBetaUnitTest --stacktrace
+        run: ./gradlew testDebugUnitTest --stacktrace
 
-      - name: Build Beta APK
-        run: ./gradlew assembleBeta --stacktrace
+      - name: Build Beta Debug APK
+        run: |
+          echo "originApplicationIdSuffix=.beta" >> gradle.properties
+          echo "originVersionSuffix=-beta" >> gradle.properties
+          ./gradlew assembleDebug --stacktrace
+
+      - name: List Beta APK files
+        run: |
+          echo "Beta Debug APK files generated:"
+          find app/build/outputs/apk/debug -name "*.apk" -type f || echo "No APK files found"
 
       - name: Upload Beta APK
         uses: actions/upload-artifact@v4
         with:
           name: origin-beta-apk-${{ github.run_number }}
-          path: app/build/outputs/apk/beta/*.apk
+          path: app/build/outputs/apk/debug/*.apk
           retention-days: 30
           if-no-files-found: error
