@@ -11,7 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -78,7 +77,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JAVA_HOME: /usr/lib/jvm/java-21-openjdk-amd64
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -113,10 +111,7 @@ jobs:
         run: ./gradlew testDebugUnitTest --stacktrace
 
       - name: Build Beta Debug APK
-        run: |
-          echo "originApplicationIdSuffix=.beta" >> gradle.properties
-          echo "originVersionSuffix=-beta" >> gradle.properties
-          ./gradlew assembleDebug --stacktrace
+        run: ./gradlew assembleDebug -Pandroid.applicationIdSuffix=.beta -Pandroid.versionNameSuffix=-beta --stacktrace
 
       - name: List Beta APK files
         run: |
