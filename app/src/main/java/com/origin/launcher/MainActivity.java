@@ -13,7 +13,7 @@ import android.net.Uri;
 import com.bumptech.glide.Glide;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction; 
+import androidx.fragment.app.FragmentTransaction;
 import com.google.android.material.progressindicator.LinearProgressIndicator;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -77,21 +77,21 @@ private static final int REQ_STORAGE_PERMS = 100;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        
+
         setContentView(R.layout.activity_main);
 
 
         checkFirstLaunch();
         InbuiltModSizeStore.getInstance().init(getApplicationContext());
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
-        
+
         ThemeUtils.applyThemeToBottomNavigation(bottomNavigationView);
-        
+
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment selectedFragment = null;
             String presenceActivity = "";
             int newIndex = -1;
-            
+
             if (item.getItemId() == R.id.navigation_home) {
                 selectedFragment = new HomeFragment();
                 presenceActivity = "In Home";
@@ -112,13 +112,13 @@ private static final int REQ_STORAGE_PERMS = 100;
             if (selectedFragment != null) {
                 // Determine direction based on tab indices
                 boolean isForward = newIndex > getCurrentFragmentIndex();
-                
+
                 navigateToFragmentWithAnimation(selectedFragment, isForward);
-                
+
                 setCurrentFragmentIndex(newIndex);
-                
+
                 DiscordRPCHelper.getInstance().updatePresence(presenceActivity, "Using the best MCPE Client");
-                
+
                 return true;
             }
             return false;
@@ -131,7 +131,7 @@ private static final int REQ_STORAGE_PERMS = 100;
             setCurrentFragmentIndex(0);
         }
     }
-    
+
     private int getCurrentFragmentIndex() {
         return currentFragmentIndex;
     }
@@ -142,28 +142,28 @@ private static final int REQ_STORAGE_PERMS = 100;
 
     private void navigateToFragmentWithAnimation(Fragment fragment, boolean isForward) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        
+
         if (isForward) {
             transaction.setCustomAnimations(
-                R.anim.slide_in_right, 
-                R.anim.slide_out_left, 
-                R.anim.slide_in_left,  
-                R.anim.slide_out_right 
+                R.anim.slide_in_right,
+                R.anim.slide_out_left,
+                R.anim.slide_in_left,
+                R.anim.slide_out_right
             );
         } else {
             transaction.setCustomAnimations(
-                R.anim.slide_in_left,  
-                R.anim.slide_out_right,  
-                R.anim.slide_in_right,  
-                R.anim.slide_out_left 
+                R.anim.slide_in_left,
+                R.anim.slide_out_right,
+                R.anim.slide_in_right,
+                R.anim.slide_out_left
             );
         }
-        
+
         transaction.replace(R.id.fragment_container, fragment);
         transaction.commit();
     }
 
- 
+
 
 private void checkFirstLaunch() {
     SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
@@ -178,7 +178,7 @@ private void checkFirstLaunch() {
             ensureStorageAccess(prefs);
             return;
         }
-        
+
         showFirstLaunchDialog(prefs, disclaimerShown, themesDialogShown, creditsShown);
         prefs.edit().putBoolean(KEY_FIRST_LAUNCH, false).apply();
     } else if (!storageAsked) {
@@ -211,7 +211,7 @@ private void ensureStorageAccess(SharedPreferences prefs) {
             return;
         }
     }
-    
+
     prefs.edit().putBoolean(KEY_STORAGE_PERMS_ASKED, true).apply();
     continueFirstLaunchFlow(prefs);
 }
@@ -245,7 +245,7 @@ private void continueFirstLaunchFlow(SharedPreferences prefs) {
     } else if (!creditsShown) {
         showThanksDialog(prefs);
     } else if (!themesDialogShown) {
-        
+
     }
 }
 
@@ -264,7 +264,7 @@ private void showFirstLaunchDialog(SharedPreferences prefs,
                 } else if (!creditsShown) {
                     showThanksDialog(prefs);
                 } else if (!themesDialogShown) {
-                    
+
                 }
             })
             .setCancelable(false)
@@ -274,22 +274,22 @@ private void showFirstLaunchDialog(SharedPreferences prefs,
 private void showDisclaimerDialog(SharedPreferences prefs) {
     new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
             .setTitle("Important Disclaimer")
-            .setMessage("This application is not affiliated with, endorsed by, or related to Mojang Studios, Microsoft Corporation, or any of their subsidiaries." 
+            .setMessage("This application is not affiliated with, endorsed by, or related to Mojang Studios, Microsoft Corporation, or any of their subsidiaries."
 +
-                       "Minecraft is a trademark of Mojang Studios. This is an independent third-party launcher." 
+                       "Minecraft is a trademark of Mojang Studios. This is an independent third-party launcher."
 +
                        "By clicking 'I Understand', you acknowledge that you use this launcher at your own risk and that the developers are not responsible for any issues that may arise.")
             .setIcon(R.drawable.ic_warning)
             .setPositiveButton("I Understand", (dialog, which) -> {
                 dialog.dismiss();
                 prefs.edit().putBoolean(KEY_DISCLAIMER_SHOWN, true).apply();
-               
+
                 boolean creditsShown = prefs.getBoolean(KEY_CREDITS_SHOWN, false);
                 boolean themesDialogShown = prefs.getBoolean(KEY_THEMES_DIALOG_SHOWN, false);
                 if (!creditsShown) {
                     showThanksDialog(prefs);
                 } else if (!themesDialogShown) {
-                    
+
                 }
             })
             .setCancelable(false)
@@ -308,6 +308,7 @@ private void showThanksDialog(SharedPreferences prefs) {
     cards.add(new CreditsAdapter.CreditCard("Light", "RadiantByte", "https://avatars.githubusercontent.com/u/198057285?v=4", "💭"));
     cards.add(new CreditsAdapter.CreditCard("Kitsuri", "Kitsuri-Studios", "https://avatars.githubusercontent.com/u/220755073?v=4", "One Place For All Case: Native Development..."));
     cards.add(new CreditsAdapter.CreditCard("GX", "dreamguxiang", "https://avatars.githubusercontent.com/u/62042544?v=4", "No Tag line Needed, Already Perfect"));
+    cards.add(new CreditsAdapter.CreditCard("Fzul","faizul726", "https://avatars.githubusercontent.com/u/162413089?v=4", "🌳 Living life..."));
 
     CreditsAdapter adapter = new CreditsAdapter(this, cards);
     recycler.setAdapter(adapter);
@@ -315,11 +316,11 @@ private void showThanksDialog(SharedPreferences prefs) {
     LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false);
     recycler.setLayoutManager(layoutManager);
 
-    
+
     PagerSnapHelper snapHelper = new PagerSnapHelper();
     snapHelper.attachToRecyclerView(recycler);
 
-    
+
     recycler.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
     @Override
     public void onLayoutChange(View v, int left, int top, int right, int bottom,
@@ -336,7 +337,7 @@ private void showThanksDialog(SharedPreferences prefs) {
     }
 });
 
-    
+
     recycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
         @Override
         public void onScrolled(@NonNull RecyclerView rv, int dx, int dy) {
@@ -357,7 +358,7 @@ private void showThanksDialog(SharedPreferences prefs) {
             .setPositiveButton("Continue", (dialog, which) -> {
                 dialog.dismiss();
                 prefs.edit().putBoolean(KEY_CREDITS_SHOWN, true).apply();
-                
+
             })
             .setCancelable(false)
             .show();
@@ -365,13 +366,13 @@ private void showThanksDialog(SharedPreferences prefs) {
 
 private void animateCardsSequentially(LinearLayout container, int index) {
     if (index >= container.getChildCount()) return;
-    
+
     View card = container.getChildAt(index);
     animateCardEntrance(card);
-    
+
     new Handler().postDelayed(() -> {
         animateCardsSequentially(container, index + 1);
-    }, 100);  
+    }, 100);
 }
 
 
@@ -400,14 +401,14 @@ private void addCreditCard(LinearLayout container, String handle, String usernam
         profileTagline.setTextColor(neon);
     }
 
-    
+
     animateCardEntrance(card);
 
-    
+
     card.setScaleX(0.9f);
     card.setScaleY(0.9f);
 
-    
+
     card.setOnClickListener(v -> {
         Intent browserIntent = new Intent(Intent.ACTION_VIEW,
                 Uri.parse("https://github.com/" + username));
@@ -421,7 +422,7 @@ private void animateCardEntrance(View card) {
     card.setAlpha(0f);
     card.setScaleX(0.8f);
     card.setScaleY(0.8f);
-    
+
     card.animate()
         .alpha(1f)
         .scaleX(1f)
@@ -467,7 +468,7 @@ private void showThemesDialog(SharedPreferences prefs, boolean disclaimerShown) 
             .setPositiveButton("Proceed", (dialog, which) -> {
                 dialog.dismiss();
                 prefs.edit().putBoolean(KEY_THEMES_DIALOG_SHOWN, true).apply();
-                
+
             })
             .setCancelable(false)
             .show();
@@ -476,10 +477,10 @@ private void showThemesDialog(SharedPreferences prefs, boolean disclaimerShown) 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        
-        Log.d(TAG, "MainActivity onActivityResult: requestCode=" + requestCode + 
+
+        Log.d(TAG, "MainActivity onActivityResult: requestCode=" + requestCode +
               ", resultCode=" + resultCode + ", data=" + (data != null ? "present" : "null"));
-              
+
         if (requestCode == REQ_STORAGE_PERMS) {
         SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
 createNoMediaFile();
@@ -487,13 +488,13 @@ createNoMediaFile();
         continueFirstLaunchFlow(prefs);
         return;
     }
-        
+
         if (requestCode == DiscordLoginActivity.DISCORD_LOGIN_REQUEST_CODE && settingsFragment != null) {
             Log.d(TAG, "Forwarding Discord login result to SettingsFragment");
             settingsFragment.onActivityResult(requestCode, resultCode, data);
         }
     }
-    
+
     @Override
 public void onRequestPermissionsResult(int requestCode,
                                        @NonNull String[] permissions,
@@ -509,29 +510,29 @@ public void onRequestPermissionsResult(int requestCode,
     @Override
     protected void onResume() {
         super.onResume();
-        
+
         DiscordRPCHelper.getInstance().updatePresence("Using Xelo Client", "Using the best MCPE Client");
     }
-    
+
     @Override
     protected void onApplyTheme() {
         super.onApplyTheme();
-        
+
         BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         if (bottomNavigationView != null) {
             try {
-                int currentBackground = Color.parseColor("#141414"); 
+                int currentBackground = Color.parseColor("#141414");
                 if (bottomNavigationView.getBackground() != null) {
                     try {
                         currentBackground = ((android.graphics.drawable.ColorDrawable) bottomNavigationView.getBackground()).getColor();
                     } catch (Exception e) {
                     }
                 }
-                
+
                 int targetBackground = ThemeManager.getInstance().getColor("surface");
-                
+
                 ThemeUtils.animateBackgroundColorTransition(bottomNavigationView, currentBackground, targetBackground, 300);
-                
+
                 ThemeUtils.applyThemeToBottomNavigation(bottomNavigationView);
             } catch (Exception e) {
                 ThemeUtils.applyThemeToBottomNavigation(bottomNavigationView);
