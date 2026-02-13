@@ -15,6 +15,8 @@ import com.origin.launcher.FeatureSettings;
 import com.origin.launcher.LoadingDialog;
 import android.util.Log;
 
+import com.origin.launcher.XeloMod;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -147,9 +149,12 @@ if (!shouldLoadPlayFab(version)) {
                     gameManager.loadLibrary("MediaDecoders_Android");
                     gameManager.loadLibrary("minecraftpe");
                     gameManager.loadLibrary("xelo");
-                    gameManager.loadLibrary("mtbinloader2");
                 }
+                
+                gameManager.loadLibrary("mtbinloader2");
+                
                 ModNativeLoader.loadEnabledSoMods(ModManager.getInstance(), context.getCacheDir());
+                
 
                 activity.runOnUiThread(() -> {
                     dismissLoading();
