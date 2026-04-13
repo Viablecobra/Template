@@ -72,6 +72,12 @@ public class ConfigurationFragment extends BaseThemedFragment {
                         } catch (Throwable ignored) {}
                     }
             );
+            // for login
+            addSwitchItem(
+                    getString(R.string.launcher_managed_mc_login),
+                    fs.isLauncherManagedMcLoginEnabled(),
+                    (btn, checked) -> fs.setLauncherManagedMcLoginEnabled(checked)
+            );
         }));
 
         settingsRecyclerView.post(() ->

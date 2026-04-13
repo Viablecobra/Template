@@ -8,12 +8,6 @@ android {
     compileSdk 36
     buildToolsVersion "36.0.0"
 
-repositories {
-        google()
-        mavenCentral()
-        maven { url 'https://jitpack.io' }
-    }
-
     defaultConfig {
         applicationId "com.origin.launcher"
         minSdk 26
@@ -34,13 +28,9 @@ repositories {
     }
 }
     
-    buildFeatures {
+        buildFeatures {
         viewBinding true
-    }
-    buildFeatures {
         prefab true
-    }
-    buildFeatures {
         buildConfig true
     }
 
@@ -77,26 +67,17 @@ repositories {
     ndkVersion "27.2.12479018"
 
     packagingOptions {
-    
-        jniLibs {
-            useLegacyPackaging = true
-        }
-    
-        pickFirst '**/libc++_shared.so'
-        pickFirst '**/libjnidispatch.so'
-        pickFirst '**/libxcrash.so'
-        pickFirst '**/libxcrash_dumper.so'
-
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/AL2.0'
-        exclude 'META-INF/LGPL2.1'
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/INDEX.LIST'
-    }
+    jniLibs.useLegacyPackaging = true
+    doNotStrip "**/*.so"
+    resources.excludes += [
+        "DebugProbesKt.bin"
+    ]
+    resources.pickFirsts += [
+        "META-INF/INDEX.LIST",
+        "META-INF/DEPENDENCIES",
+        "META-INF/io.netty.versions.properties"
+    ]
+}
 }
 
 dependencies {
@@ -124,4 +105,5 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    implementation libs.bedrock.connection
 }
