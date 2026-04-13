@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background">
+
+    <com.origin.launcher.views.AmoledGlowView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <!-- Content: WebView full area -->
+        <WebView
+            android:id="@+id/msft_login_webview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <!-- Floating header overlay -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top"
+            android:background="@color/surface"
+            android:elevation="8dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="8dp">
+
+            <ImageButton
+                android:id="@+id/back_button"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="8dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:src="@drawable/ic_arrow_down"
+                android:rotation="0"
+                android:contentDescription="@string/back"
+                android:tint="@color/onSurface" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/ms_login_title"
+                android:textStyle="bold"
+                android:textSize="18sp"
+                android:fontFamily="@font/mojangles"/>
+
+        </LinearLayout>
+
+        <!-- Hidden status text for background updates -->
+        <TextView
+            android:id="@+id/msft_login_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="top|center_horizontal"
+            android:layout_marginTop="56dp"
+            android:visibility="gone"
+            android:text="@string/ms_login_starting"
+            android:textColor="@color/onSurface"
+            android:textSize="14sp"
+            android:fontFamily="@font/mojangles"/>
+
+    </FrameLayout>
+
+</FrameLayout>

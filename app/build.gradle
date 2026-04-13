@@ -78,10 +78,6 @@ repositories {
 
     packagingOptions {
     
-        jniLibs {
-            useLegacyPackaging = true
-        }
-    
         pickFirst '**/libc++_shared.so'
         pickFirst '**/libjnidispatch.so'
         pickFirst '**/libxcrash.so'
@@ -124,4 +120,5 @@ dependencies {
     testImplementation libs.junit
     androidTestImplementation libs.ext.junit
     androidTestImplementation libs.espresso.core
+    implementation libs.bedrock.connection
 }
