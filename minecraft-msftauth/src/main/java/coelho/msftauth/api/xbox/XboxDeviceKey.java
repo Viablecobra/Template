@@ -207,7 +207,7 @@ public class XboxDeviceKey {
     }
 
     public static XboxDeviceKey restoreKeyAndId(@NotNull Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("org.levimc.xal.crypto", Context.MODE_PRIVATE);
+        SharedPreferences sharedPreferences = context.getSharedPreferences("xelo_client.xal.crypto", Context.MODE_PRIVATE);
         if (!sharedPreferences.contains("id") || !sharedPreferences.contains("public") || !sharedPreferences.contains("private")) {
             return null;
         }
@@ -241,7 +241,7 @@ public class XboxDeviceKey {
         if (!(idToStore.startsWith("{") && idToStore.endsWith("}"))) {
             idToStore = "{" + idToStore + "}";
         }
-        SharedPreferences.Editor edit = context.getSharedPreferences("org.levimc.xal.crypto", Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor edit = context.getSharedPreferences("xelo_client.xal.crypto", Context.MODE_PRIVATE).edit();
         edit.putString("id", idToStore);
         edit.putString("public", android.util.Base64.encodeToString(this.ecKey.getPublic().getEncoded(), android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING | android.util.Base64.URL_SAFE));
         edit.putString("private", android.util.Base64.encodeToString(this.ecKey.getPrivate().getEncoded(), android.util.Base64.NO_WRAP | android.util.Base64.NO_PADDING | android.util.Base64.URL_SAFE));
