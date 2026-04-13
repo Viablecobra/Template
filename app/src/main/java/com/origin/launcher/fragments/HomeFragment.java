@@ -21,13 +21,17 @@ import android.os.Build;
 import android.os.Environment;
 import android.net.Uri;
 import android.provider.Settings;
+import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.GradientDrawable;
 import android.view.Gravity;
 import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -51,9 +55,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import android.os.Looper;
 import android.content.res.ColorStateList;
+import android.util.TypedValue;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 import androidx.appcompat.app.AlertDialog;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import com.origin.launcher.manager.ThemeManager;
 import com.origin.launcher.utils.ThemeUtils;
 import android.util.Log;
@@ -74,6 +81,21 @@ import com.origin.launcher.manager.ResourcepackHandler;
 import com.origin.launcher.versions.GameVersion;
 import android.app.Activity;
 import androidx.core.content.ContextCompat;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+
+import coelho.msftauth.api.oauth20.OAuth20Token;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
+import com.origin.launcher.account.MsftAccountStore;
+import com.origin.launcher.account.MsftAuthManager;
+import com.origin.launcher.activity.AccountsActivity;
+import com.origin.launcher.activity.MsftLoginActivity;
+import com.origin.launcher.dialogs.LoadingDialog;
+import com.origin.launcher.utils.AccountTextUtils;
+import com.origin.launcher.utils.DialogUtils;
 
 public class HomeFragment extends BaseThemedFragment {
 
@@ -84,6 +106,16 @@ public class HomeFragment extends BaseThemedFragment {
     private com.google.android.material.button.MaterialButton shareLogsButton;
     private MinecraftLauncher minecraftLauncher;
     private VersionManager versionManager;
+
+    private com.microsoft.xbox.idp.toolkit.CircleImageView accountAvatar;
+    private View accountAvatarContainer;
+    private ProgressBar avatarProgress;
+    private Button signInButton;
+    private String lastAvatarXuid;
+    private final OkHttpClient avatarClient = new OkHttpClient();
+    private ExecutorService accountExecutor = Executors.newSingleThreadExecutor();
+    private LoadingDialog accountLoadingDialog;
+    private ActivityResultLauncher<Intent> accountLoginLauncher;
 
     private boolean hasStoragePermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
@@ -224,6 +256,24 @@ public class HomeFragment extends BaseThemedFragment {
             return;
         }
 
+        if (FeatureSettings.getInstance().isLauncherManagedMcLoginEnabled()) {
+            MsftAccountStore.MsftAccount active = getActiveAccount();
+            boolean loggedIn = active != null
+                    && active.minecraftUsername != null
+                    && !active.minecraftUsername.isEmpty();
+            if (!loggedIn) {
+                mbl2_button.setEnabled(true);
+                new AlertDialog.Builder(requireContext())
+                        .setTitle(getString(R.string.dialog_title_login_required))
+                        .setMessage(getString(R.string.dialog_message_login_required))
+                        .setPositiveButton(getString(R.string.go_to_accounts), (d, w) ->
+                                startActivity(new Intent(requireContext(), AccountsActivity.class)))
+                        .setNegativeButton(getString(R.string.disable_launcher_login_and_continue), null)
+                        .show();
+                return;
+            }
+        }
+
         GameVersion version = versionManager != null ? versionManager.getSelectedVersion() : null;
 
         if (version == null) {
@@ -285,6 +335,310 @@ public class HomeFragment extends BaseThemedFragment {
         ExecutorService executorService = Executors.newSingleThreadExecutor();
         new ResourcepackHandler((Activity) getActivity(), minecraftLauncher, executorService)
             .checkIntentForResourcepack();
+    }
+
+    private void registerAccountLoginLauncher() {
+        accountLoginLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                if (result.getResultCode() == android.app.Activity.RESULT_OK && result.getData() != null) {
+                    String code = result.getData().getStringExtra("ms_auth_code");
+                    String codeVerifier = result.getData().getStringExtra("ms_code_verifier");
+                    if (code != null && codeVerifier != null) {
+                        accountLoadingDialog = DialogUtils.ensure(requireActivity(), accountLoadingDialog);
+                        DialogUtils.showWithMessage(accountLoadingDialog, getString(R.string.ms_login_exchanging));
+
+                        accountExecutor.execute(() -> {
+                            OkHttpClient client = new OkHttpClient();
+                            try {
+                                OAuth20Token token = MsftAuthManager.exchangeCodeForToken(
+                                    client,
+                                    MsftAuthManager.DEFAULT_CLIENT_ID,
+                                    code, codeVerifier,
+                                    MsftAuthManager.DEFAULT_SCOPE + " offline_access"
+                                );
+
+                                requireActivity().runOnUiThread(() ->
+                                    DialogUtils.showWithMessage(accountLoadingDialog,
+                                        getString(R.string.ms_login_auth_xbox_device)));
+
+                                MsftAuthManager.XboxAuthResult xbox =
+                                    MsftAuthManager.performXboxAuth(client, token, requireContext());
+
+                                requireActivity().runOnUiThread(() ->
+                                    DialogUtils.showWithMessage(accountLoadingDialog,
+                                        getString(R.string.ms_login_fetch_minecraft_identity)));
+
+                                android.util.Pair<String, String> nameAndXuid =
+                                    MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
+                                String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+                                String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+                                MsftAuthManager.saveAccount(requireContext(), token,
+                                    xbox.gamertag(), minecraftUsername, xuid, xbox.avatarUrl());
+
+                                requireActivity().runOnUiThread(() -> {
+                                    DialogUtils.dismissQuietly(accountLoadingDialog);
+                                    Toast.makeText(requireContext(),
+                                        getString(R.string.ms_login_success,
+                                            minecraftUsername != null ? minecraftUsername
+                                                : getString(R.string.not_signed_in)),
+                                        Toast.LENGTH_SHORT).show();
+                                    refreshAccountHeaderUI();
+                                });
+                            } catch (Exception e) {
+                                requireActivity().runOnUiThread(() -> {
+                                    DialogUtils.dismissQuietly(accountLoadingDialog);
+                                    Toast.makeText(requireContext(),
+                                        getString(R.string.ms_login_failed_detail, e.getMessage()),
+                                        Toast.LENGTH_LONG).show();
+                                    refreshAccountHeaderUI();
+                                });
+                            }
+                        });
+                        return;
+                    }
+                }
+                refreshAccountHeaderUI();
+            }
+        );
+    }
+
+    private void initAccountHeader() {
+        View view = getView();
+        if (view == null) return;
+
+        signInButton = view.findViewById(R.id.signInButton);
+        accountAvatar = view.findViewById(R.id.accountAvatar);
+        accountAvatarContainer = view.findViewById(R.id.accountAvatarContainer);
+        avatarProgress = view.findViewById(R.id.avatarProgress);
+
+        if (signInButton != null) {
+            signInButton.setOnClickListener(v -> {
+                Intent intent = new Intent(requireContext(), MsftLoginActivity.class);
+                accountLoginLauncher.launch(intent);
+            });
+        }
+        if (accountAvatarContainer != null) {
+            accountAvatarContainer.setOnClickListener(this::showAccountSwitchPopup);
+        }
+
+        refreshAccountHeaderUI();
+    }
+
+    private MsftAccountStore.MsftAccount getActiveAccount() {
+        java.util.List<MsftAccountStore.MsftAccount> list = MsftAccountStore.list(requireContext());
+        for (MsftAccountStore.MsftAccount a : list) if (a.active) return a;
+        return null;
+    }
+
+    private void refreshAccountHeaderUI() {
+        MsftAccountStore.MsftAccount active = getActiveAccount();
+        if (active == null) {
+            if (signInButton != null) signInButton.setVisibility(View.VISIBLE);
+            if (accountAvatarContainer != null) accountAvatarContainer.setVisibility(View.GONE);
+            if (accountAvatar != null) accountAvatar.setImageDrawable(null);
+            lastAvatarXuid = null;
+            if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+        } else {
+            if (signInButton != null) signInButton.setVisibility(View.GONE);
+            if (accountAvatarContainer != null) accountAvatarContainer.setVisibility(View.VISIBLE);
+            loadXboxAvatar(active);
+        }
+    }
+
+    private void loadXboxAvatar(MsftAccountStore.MsftAccount active) {
+        if (accountAvatar == null) return;
+        String url = AccountTextUtils.sanitizeUrl(active != null ? active.xboxAvatarUrl : null);
+        if (url == null) {
+            if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+            accountAvatar.setImageDrawable(null);
+            lastAvatarXuid = null;
+            return;
+        }
+        accountAvatar.setImageDrawable(null);
+        if (avatarProgress != null) avatarProgress.setVisibility(View.VISIBLE);
+        accountExecutor.execute(() -> {
+            try {
+                try (Response imgResp = avatarClient.newCall(
+                        new Request.Builder().url(url).build()).execute()) {
+                    Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null)
+                        ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream())
+                        : null;
+                    requireActivity().runOnUiThread(() -> {
+                        if (bmp != null) accountAvatar.setImageBitmap(bmp);
+                        if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+                    });
+                }
+            } catch (Exception e) {
+                requireActivity().runOnUiThread(() -> {
+                    if (avatarProgress != null) avatarProgress.setVisibility(View.GONE);
+                });
+            }
+        });
+    }
+
+    private void showAccountSwitchPopup(View anchor) {
+        if (getContext() == null) return;
+        java.util.List<MsftAccountStore.MsftAccount> list = MsftAccountStore.list(requireContext());
+
+        View content = LayoutInflater.from(requireContext())
+            .inflate(R.layout.popup_account_switch, null);
+        RecyclerView recyclerAccounts = content.findViewById(R.id.recycler_accounts);
+        TextView manageAction = content.findViewById(R.id.manage_action);
+        com.microsoft.xbox.idp.toolkit.CircleImageView headerAvatar =
+            content.findViewById(R.id.header_avatar);
+        View headerContainer = content.findViewById(R.id.header_container);
+        TextView headerName = content.findViewById(R.id.header_name);
+
+        TypedValue outValue = new TypedValue();
+        requireContext().getTheme().resolveAttribute(
+            android.R.attr.selectableItemBackground, outValue, true);
+        int selectableRes = outValue.resourceId;
+        int paddingH = (int) (16 * getResources().getDisplayMetrics().density);
+        int paddingV = (int) (12 * getResources().getDisplayMetrics().density);
+        int paddingR = (int) (12 * getResources().getDisplayMetrics().density);
+
+        MsftAccountStore.MsftAccount active = getActiveAccount();
+        headerName.setText(AccountTextUtils.displayNameOrNotSigned(requireContext(), active));
+        if (accountAvatar != null && accountAvatar.getDrawable() != null) {
+            headerAvatar.setImageDrawable(accountAvatar.getDrawable());
+        } else if (active != null) {
+            final String url = AccountTextUtils.sanitizeUrl(active.xboxAvatarUrl);
+            if (url != null) {
+                accountExecutor.execute(() -> {
+                    try {
+                        OkHttpClient client = new OkHttpClient();
+                        Response imgResp = client.newCall(
+                            new Request.Builder().url(url).build()).execute();
+                        final Bitmap bmp = (imgResp.isSuccessful() && imgResp.body() != null)
+                            ? android.graphics.BitmapFactory.decodeStream(imgResp.body().byteStream())
+                            : null;
+                        requireActivity().runOnUiThread(() -> {
+                            if (bmp != null) headerAvatar.setImageBitmap(bmp);
+                        });
+                    } catch (Exception ignored) {}
+                });
+            }
+        }
+
+        final PopupWindow popup = new PopupWindow(content,
+            ViewGroup.LayoutParams.WRAP_CONTENT,
+            ViewGroup.LayoutParams.WRAP_CONTENT, true);
+        popup.setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+        popup.setOutsideTouchable(true);
+        if (android.os.Build.VERSION.SDK_INT >= 21) popup.setElevation(8f);
+
+        final android.view.ViewGroup root = requireActivity().findViewById(android.R.id.content);
+        final View scrim = new View(requireContext());
+        scrim.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.scrim));
+        scrim.setClickable(true);
+        scrim.setOnClickListener(v -> popup.dismiss());
+        root.addView(scrim, new ViewGroup.LayoutParams(
+            ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        scrim.setAlpha(0f);
+        scrim.animate().alpha(1f).setDuration(120).start();
+
+        final java.util.List<MsftAccountStore.MsftAccount> displayList = new java.util.ArrayList<>();
+        for (MsftAccountStore.MsftAccount a : list) {
+            if (active == null || !android.text.TextUtils.equals(a.id, active.id))
+                displayList.add(a);
+        }
+
+        recyclerAccounts.setLayoutManager(new LinearLayoutManager(requireContext()));
+        recyclerAccounts.setAdapter(new RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+            @NonNull
+            @Override
+            public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                TextView row = new TextView(parent.getContext());
+                row.setLayoutParams(new RecyclerView.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+                row.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.on_surface));
+                row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
+                row.setPadding(paddingH, paddingV, paddingR, paddingV);
+                row.setBackgroundResource(selectableRes);
+                return new RecyclerView.ViewHolder(row) {};
+            }
+
+            @Override
+            public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+                MsftAccountStore.MsftAccount account = displayList.get(position);
+                ((TextView) holder.itemView).setText(AccountTextUtils.titleOrUnknown(account));
+                holder.itemView.setOnClickListener(v -> {
+                    popup.dismiss();
+                    MsftAccountStore.setActive(requireContext(), account.id);
+                    boolean withinSevenDays = AccountTextUtils.isRecentlyUpdated(account, 7);
+                    if (withinSevenDays) {
+                        String statusName = AccountTextUtils.displayNameOrNotSigned(
+                            requireContext(), account);
+                        Toast.makeText(requireContext(),
+                            getString(R.string.ms_login_success, statusName),
+                            Toast.LENGTH_SHORT).show();
+                        refreshAccountHeaderUI();
+                        return;
+                    }
+                    accountLoadingDialog = DialogUtils.ensure(requireActivity(), accountLoadingDialog);
+                    DialogUtils.showWithMessage(accountLoadingDialog,
+                        getString(R.string.ms_login_auth_xbox_device));
+                    accountExecutor.execute(() -> {
+                        OkHttpClient client = new OkHttpClient();
+                        try {
+                            MsftAuthManager.XboxAuthResult xbox =
+                                MsftAuthManager.refreshAndAuth(client, account, requireContext());
+                            android.util.Pair<String, String> nameAndXuid =
+                                MsftAuthManager.fetchMinecraftIdentity(client, xbox.xstsToken());
+                            String minecraftUsername = nameAndXuid != null ? nameAndXuid.first : null;
+                            String xuid = nameAndXuid != null ? nameAndXuid.second : null;
+                            MsftAccountStore.addOrUpdate(requireContext(), account.msUserId,
+                                account.refreshToken, xbox.gamertag(), minecraftUsername,
+                                xuid, xbox.avatarUrl());
+                            MsftAccountStore.setActive(requireContext(), account.id);
+                            requireActivity().runOnUiThread(() -> {
+                                DialogUtils.dismissQuietly(accountLoadingDialog);
+                                String statusName = minecraftUsername != null ? minecraftUsername
+                                    : getString(R.string.not_signed_in);
+                                Toast.makeText(requireContext(),
+                                    getString(R.string.ms_login_success, statusName),
+                                    Toast.LENGTH_SHORT).show();
+                                refreshAccountHeaderUI();
+                            });
+                        } catch (Exception e) {
+                            requireActivity().runOnUiThread(() -> {
+                                DialogUtils.dismissQuietly(accountLoadingDialog);
+                                Toast.makeText(requireContext(),
+                                    getString(R.string.ms_login_failed_detail, e.getMessage()),
+                                    Toast.LENGTH_LONG).show();
+                                refreshAccountHeaderUI();
+                            });
+                        }
+                    });
+                });
+            }
+
+            @Override
+            public int getItemCount() { return displayList.size(); }
+        });
+
+        float density = getResources().getDisplayMetrics().density;
+        if (displayList.size() > 2) {
+            recyclerAccounts.getLayoutParams().height = (int) ((48 * 2 + 16) * density);
+        } else {
+            recyclerAccounts.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+        }
+
+        manageAction.setOnClickListener(v -> {
+            popup.dismiss();
+            startActivity(new Intent(requireContext(), AccountsActivity.class));
+        });
+
+        popup.setOnDismissListener(() -> {
+            if (root != null && scrim != null) {
+                scrim.animate().alpha(0f).setDuration(120).withEndAction(() -> {
+                    try { root.removeView(scrim); } catch (Exception ignored) {}
+                }).start();
+            }
+        });
+
+        popup.showAsDropDown(anchor, 0, 0, Gravity.END);
     }
 
     @Override
@@ -354,6 +708,8 @@ public class HomeFragment extends BaseThemedFragment {
         super.onViewCreated(view, savedInstanceState);
         setupManagersAndHandlers();
         checkResourcepack();
+        registerAccountLoginLauncher();
+        initAccountHeader();
     }
 
     @Override
@@ -363,6 +719,10 @@ public class HomeFragment extends BaseThemedFragment {
         mbl2_button = null;
         versions_button = null;
         shareLogsButton = null;
+        signInButton = null;
+        accountAvatar = null;
+        accountAvatarContainer = null;
+        avatarProgress = null;
     }
 
     /**
@@ -610,6 +970,7 @@ public class HomeFragment extends BaseThemedFragment {
     public void onResume() {
         super.onResume();
         DiscordRPCHelper.getInstance().updateMenuPresence("Playing");
+        refreshAccountHeaderUI();
     }
 
     @Override
