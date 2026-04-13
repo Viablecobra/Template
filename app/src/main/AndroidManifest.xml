@@ -191,7 +191,7 @@
 
         <!-- Accounts Management -->
         <activity
-            android:name="com.origin.launcher.account.AccountsActivity"
+            android:name="com.origin.launcher.activity.AccountsActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"
@@ -199,7 +199,7 @@
             android:label="@string/accounts_title" />
 
         <activity
-            android:name="com.origin.launcher.account.MsftLoginActivity"
+            android:name="com.origin.launcher.activity.MsftLoginActivity"
             android:exported="false"
             android:screenOrientation="portrait"
             android:configChanges="fontScale|density|smallestScreenSize|screenSize|uiMode|screenLayout|orientation|navigation|keyboardHidden|keyboard|touchscreen|locale|mnc|mcc"

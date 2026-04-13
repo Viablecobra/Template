@@ -1,4 +1,4 @@
-package com.origin.launcher.auth;
+package com.origin.launcher.account;
 
 import android.content.Context;
 import android.util.Base64;
