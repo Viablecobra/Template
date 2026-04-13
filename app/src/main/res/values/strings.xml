@@ -158,7 +158,7 @@ main menu first</string>
     <string name="xbox_avatar">Xbox avatar</string>
     <string name="launcher_managed_mc_login">Viable Account Manager</string>
     <string name="dialog_title_login_required">Sign-in required</string>
-    <string name="dialog_message_login_required">Launcher-managed login is enabled, but no account is signed in. Go to Accounts to sign in.</string>
+    <string name="dialog_message_login_required">login with Xelo Client is enabled, but no account is signed in. Go to Accounts to sign in.</string>
     <string name="go_to_accounts">Accounts</string>
     <string name="disable_launcher_login_and_continue">Close</string>
     <string name="ms_add_account">Add Account</string>

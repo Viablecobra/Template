@@ -552,7 +552,7 @@ public class HomeFragment extends BaseThemedFragment {
                 TextView row = new TextView(parent.getContext());
                 row.setLayoutParams(new RecyclerView.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-                row.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.on_surface));
+                row.setTextColor(ContextCompat.getColor(parent.getContext(), R.color.onSurface));
                 row.setTextSize(TypedValue.COMPLEX_UNIT_SP, 14);
                 row.setPadding(paddingH, paddingV, paddingR, paddingV);
                 row.setBackgroundResource(selectableRes);
