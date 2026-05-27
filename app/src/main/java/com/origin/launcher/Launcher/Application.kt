@@ -47,19 +47,7 @@ class LauncherApplication : Application() {
             setNativeRethrow(false)
             setAnrRethrow(false)
         })
-
-        try {
-            System.loadLibrary("xelo_init")
-            val modsDir = File(cacheDir, "mods")
-            if (!modsDir.exists()) modsDir.mkdirs()
-            Log.d("LauncherApplication", "Mods path: ${modsDir.absolutePath}")
-            nativeSetupRuntime(modsDir.absolutePath)
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
     }
-
-    external fun nativeSetupRuntime(modsPath: String)
 
     companion object {
         @JvmStatic

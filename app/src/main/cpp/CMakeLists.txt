@@ -10,7 +10,6 @@ endif()
 
 add_subdirectory(unpaircore)
 add_subdirectory(Preloader)
-add_subdirectory(xelo_init)
 add_subdirectory(XeloOverlay)
 add_subdirectory(libHttpClient/Build/libHttpClient.Android)
 add_subdirectory(xelo_motion_blur)
