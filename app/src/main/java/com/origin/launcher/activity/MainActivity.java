@@ -66,6 +66,11 @@ import com.origin.launcher.discord.DiscordRPCHelper;
 import com.origin.launcher.discord.DiscordLoginActivity;
 import com.origin.launcher.fragments.DashboardFragment;
 import com.origin.launcher.R;
+import android.text.Editable;
+import android.text.TextWatcher;
+import androidx.appcompat.app.AlertDialog;
+import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputEditText;
 
 public class MainActivity extends BaseThemedActivity {
     private static final String TAG = "MainActivity";
@@ -76,6 +81,7 @@ public class MainActivity extends BaseThemedActivity {
     private static final String KEY_CREDITS_SHOWN = "credits_shown";
     private static final String KEY_GITHUB_STAR_SHOWN = "github_star_shown"; // CHANGED: Added new key
     private static final String KEY_STORAGE_PERMS_ASKED = "storage_perms_asked";
+    private static final String KEY_BETA_WARNING_SHOWN = "beta_warning_shown";
     private static final int REQ_STORAGE_PERMS = 100;
 
     private SettingsFragment settingsFragment;
@@ -173,6 +179,12 @@ public class MainActivity extends BaseThemedActivity {
         boolean creditsShown = prefs.getBoolean(KEY_CREDITS_SHOWN, false);
         boolean githubStarShown = prefs.getBoolean(KEY_GITHUB_STAR_SHOWN, false); // CHANGED
         boolean storageAsked = prefs.getBoolean(KEY_STORAGE_PERMS_ASKED, false);
+        boolean betaWarningShown = prefs.getBoolean(KEY_BETA_WARNING_SHOWN, false);
+
+        if (!betaWarningShown) {
+            showBetaWarningDialog(prefs, isFirstLaunch, disclaimerShown, themesDialogShown, creditsShown, githubStarShown, storageAsked);
+            return;
+        }
 
         if (isFirstLaunch) {
             if (!storageAsked) {
@@ -191,6 +203,64 @@ public class MainActivity extends BaseThemedActivity {
         } else if (!githubStarShown) { // CHANGED
             showGithubStarDialog(prefs);
         }
+    }
+
+    private void showBetaWarningDialog(SharedPreferences prefs,
+                                       boolean isFirstLaunch,
+                                       boolean disclaimerShown,
+                                       boolean themesDialogShown,
+                                       boolean creditsShown,
+                                       boolean githubStarShown,
+                                       boolean storageAsked) {
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View customView = inflater.inflate(R.layout.dialog_beta_warning, null);
+
+        TextInputEditText inputField = customView.findViewById(R.id.beta_input_field);
+        MaterialButton okButton = customView.findViewById(R.id.beta_ok_button);
+
+        AlertDialog dialog = new MaterialAlertDialogBuilder(this, com.google.android.material.R.style.ThemeOverlay_Material3_MaterialAlertDialog)
+                .setView(customView)
+                .setCancelable(false)
+                .create();
+
+        okButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            prefs.edit().putBoolean(KEY_BETA_WARNING_SHOWN, true).apply();
+
+            if (isFirstLaunch) {
+                if (!storageAsked) {
+                    ensureStorageAccess(prefs);
+                    return;
+                }
+                showFirstLaunchDialog(prefs, disclaimerShown, themesDialogShown, creditsShown, githubStarShown);
+                prefs.edit().putBoolean(KEY_FIRST_LAUNCH, false).apply();
+            } else if (!storageAsked) {
+                ensureStorageAccess(prefs);
+            } else if (!disclaimerShown) {
+                showDisclaimerDialog(prefs);
+            } else if (!creditsShown) {
+                showThanksDialog(prefs);
+            } else if (!githubStarShown) {
+                showGithubStarDialog(prefs);
+            }
+        });
+
+        inputField.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                boolean match = s.toString().equalsIgnoreCase("I Understand");
+                okButton.setEnabled(match);
+                okButton.setAlpha(match ? 1.0f : 0.5f);
+            }
+        });
+
+        dialog.show();
     }
 
     private void ensureStorageAccess(SharedPreferences prefs) {
