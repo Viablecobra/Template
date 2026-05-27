@@ -1,64 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:padding="24dp">
+    android:fillViewport="true"
+    android:scrollbars="none">
 
-    <ImageView
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="12dp"
-        android:src="@drawable/ic_warning"
-        app:tint="?attr/colorError" />
-
-    <TextView
-        android:id="@+id/beta_title"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="⚠️ Beta Build Warning"
-        android:textAppearance="?attr/textAppearanceTitleLarge"
-        android:layout_marginBottom="16dp" />
+        android:orientation="vertical"
+        android:padding="24dp">
 
-    <TextView
-        android:id="@+id/beta_message"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="You are about to use a BETA build of Xelo Client.\n\nThis build is under development. Features may be incomplete, broken, unstable, or behave in entirely unexpected ways. \n\nBug reports aren't welcome — You shouldn't need to complain about unfinished features or instability.\n\nBy continuing, you confirm that you fully understand this is a beta build, you accept that you won't gonna report any bugs like a moron kid,and you will not hold the Xelo Client team responsible for any issues that arise.\n\nBy continuing Type- I Understand"
-        android:textAppearance="?attr/textAppearanceBodyMedium"
-        android:lineSpacingMultiplier="1.4"
-        android:layout_marginBottom="24dp" />
+        <ImageView
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/ic_warning"
+            app:tint="?attr/colorError" />
 
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/beta_input_layout"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint='Type "I Understand" to continue'
-        android:layout_marginBottom="16dp"
-        app:boxStrokeColor="?attr/colorPrimary"
-        app:hintTextColor="?attr/colorOnSurfaceVariant">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/beta_input_field"
+        <TextView
+            android:id="@+id/beta_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:maxLines="1"
-            android:imeOptions="actionDone" />
+            android:gravity="center"
+            android:text="⚠️ Beta Build Warning"
+            android:textAppearance="?attr/textAppearanceTitleLarge"
+            android:layout_marginBottom="16dp" />
 
-    </com.google.android.material.textfield.TextInputLayout>
+        <TextView
+            android:id="@+id/beta_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You are about to use a BETA build of Xelo Client.\n\nThis build is under development. Features may be incomplete, broken, unstable, or behave in entirely unexpected ways.\n\nBug reports aren\'t welcome — You shouldn\'t need to complain about unfinished features or instability.\n\nBy continuing, you confirm that you fully understand this is a beta build, you accept that you won\'t gonna report any bugs like a moron kid, and you will not hold the Xelo Client team responsible for any issues that arise.\n\nBy continuing Type- I Understand"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:lineSpacingMultiplier="1.4"
+            android:layout_marginBottom="24dp" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/beta_ok_button"
-        style="@style/Widget.Material3.Button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="I Understand"
-        android:enabled="false"
-        android:alpha="0.5" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/beta_input_layout"
+            style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Type &quot;I Understand&quot; to continue"
+            android:layout_marginBottom="16dp"
+            app:boxStrokeColor="?attr/colorPrimary"
+            app:hintTextColor="?attr/colorOnSurfaceVariant">
 
-</LinearLayout>
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/beta_input_field"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textNoSuggestions"
+                android:maxLines="1"
+                android:imeOptions="actionDone"
+                android:privateImeOptions="nm" />
+
+        </com.google.android.material.textfield.TextInputLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/beta_ok_button"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="I Understand"
+            android:enabled="false"
+            android:alpha="0.5" />
+
+    </LinearLayout>
+
+</ScrollView>

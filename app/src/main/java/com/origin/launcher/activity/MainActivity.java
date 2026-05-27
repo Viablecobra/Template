@@ -261,6 +261,16 @@ public class MainActivity extends BaseThemedActivity {
         });
 
         dialog.show();
+
+        if (dialog.getWindow() != null) {
+            dialog.getWindow().setSoftInputMode(android.view.WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE | android.view.WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+        }
+
+        inputField.requestFocus();
+        inputField.post(() -> {
+            android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            if (imm != null) imm.showSoftInput(inputField, android.view.inputmethod.InputMethodManager.SHOW_IMPLICIT);
+        });
     }
 
     private void ensureStorageAccess(SharedPreferences prefs) {
